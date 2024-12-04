@@ -49,7 +49,83 @@ Structure your response as follows:
 Remember, the goal is to provide a response that is both intellectually stimulating and creatively engaging. Aim to leave the reader with new insights or perspectives on the topic.
 $langSuffix""";
 
+  String get ideaPrompt => """To generate thoughtful and creative **main ideas** for a response:
+
+1. Reflect on the topic from multiple perspectives, considering its historical context, current relevance, potential future implications, and connections to various fields of study or aspects of life. 
+   
+2. Focus on generating **2-3 concise main ideas** that highlight different angles or arguments related to the topic. Avoid delving into full explanations; instead, provide a clear and focused outline of the core ideas. 
+
+3. Include examples, analogies, or metaphors only as brief suggestions to illustrate each idea, if relevant.
+
+4. Aim for depth within each idea, ensuring it is distinct and meaningful. Prioritize quality and originality over quantity.
+
+5. Highlight any counterarguments or alternative perspectives succinctly, where applicable, to indicate balance in the exploration.
+
+**Output Structure:**
+- A brief introduction or context statement about the topic.
+- A list of 2-3 main ideas, each expressed in a sentence or two.
+- (Optional) A final thought or question to inspire deeper exploration of the topic.
+
+The goal is to provide **a roadmap of key points** that are intellectually stimulating and creatively engaging, leaving space for detailed development later.
+$langSuffix""";
+
+  String get evaluationPrompt_ => """
+Evaluate the following response for clarity, grammar, and provide suggestions. Discuss also the user ability to follow the subject. Your evaluation should be written in $langSuffix
+""";
+
   String get evaluationPrompt => """
-Evaluate the following response for clarity, grammar, and provide suggestions. Discuss also the user ability to follow the subject. Your evaluation should be written in 
+Evaluate the following dissertation response based on the following criteria:  
+
+### I. Academic Rigor and Content Analysis  
+1. **Thesis Alignment and Subject Coherence**  
+   - How effectively does the dissertation address the original topic?  
+   - Is the exploration of the subject sufficiently deep and broad?  
+   - Does the dissertation align with the perspectives and insights suggested in the topic commentary?  
+
+2. **Structural and Analytical Elements**  
+   - Is the structure logical and coherent?  
+   - Does the argument progress clearly and convincingly?  
+   - Are key perspectives and insights effectively integrated?  
+
+3. **Critical Thinking and Original Contribution**  
+   - To what extent does the dissertation demonstrate critical thinking?  
+   - Does it offer unique or innovative insights?  
+   - How well does it balance analysis with originality?  
+
+### II. Technical Writing Quality  
+1. **Language and Communication**  
+   - Assess grammar, syntax, and writing precision.  
+   - Evaluate clarity and adherence to academic standards.  
+   - Are sentence structures, vocabulary, and technical elements appropriate?  
+
+2. **Citation and Research Integration**  
+   - Are references relevant, scholarly, and properly cited?  
+   - How well are external sources integrated into the arguments?  
+
+### III. Creative and Interpretative Dimensions  
+1. **Writing Technique and Style**  
+   - How effectively are creative writing techniques used?  
+   - Is the dissertation engaging and readable?  
+   - Are stylistic choices appropriate for the topic?  
+
+2. **Perspective and Interpretative Depth**  
+   - Does the dissertation consider diverse perspectives?  
+   - Are interpretations nuanced and complex?  
+   - How well are multifaceted dimensions of the topic explored?  
+
+### IV. Recommendations and Developmental Feedback  
+1. **Strengths Identification**  
+   - Highlight the strongest elements of the dissertation with specific examples.  
+
+2. **Constructive Suggestions**  
+   - Offer actionable recommendations for improvement.  
+   - Suggest concrete strategies for addressing weaknesses.  
+
+**Evaluation Format:**  
+- Provide a detailed report, incorporating both qualitative commentary and quantitative scores (1-10) for each category.  
+- Conclude with an overall assessment and actionable recommendations for further development.  
+
+**Tone:** Professional, academic, constructive, and nuanced.  
+**Length:** Approximately 500-750 words.  
 """;
 }

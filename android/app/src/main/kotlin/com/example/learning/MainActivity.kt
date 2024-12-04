@@ -1,4 +1,4 @@
-package com.example.learning
+package com.alex.discursia
 
 import io.flutter.embedding.android.FlutterActivity
 
