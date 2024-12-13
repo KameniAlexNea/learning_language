@@ -1,12 +1,12 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'prompts.dart';
 import 'llmservice.dart';
-import 'local_storage.dart';
 import 'builder.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() {
+  dotenv.load(fileName: ".env");
   runApp(const WritingAssistantApp());
 }
 
@@ -44,7 +44,6 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   bool isEvaluatingResponse = false;
   bool isGettingSuggestedAnswer = false;
   bool isGettingSuggestedIdea = false;
-  // bool _obscureApiKey = true;
 
   late Prompts prompts = Prompts("English");
   late TabController _tabController;
@@ -54,47 +53,15 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   @override
   void initState() {
     super.initState();
+
     _tabController = TabController(length: 3, vsync: this);
-    _loadSavedCredentials();
+    // _loadSavedCredentials();
     if (modelType == 0) {
       llmCall = askLLMOA;
     } else if (modelType == 1) {
       llmCall = askLLMHF;
     } else {
       llmCall = askLLMGroq;
-    }
-  }
-
-  Future<void> _loadSavedCredentials() async {
-    try {
-      final savedApiKey = await LocalStorage.readData('openai_api_key');
-      final savedLanguage = await LocalStorage.readData('selected_language');
-
-      setState(() {
-        if (savedApiKey != null) {
-          apiKeyController.text = savedApiKey;
-        }
-        if (savedLanguage != null) {
-          selectedLanguage = savedLanguage;
-          prompts = Prompts(selectedLanguage);
-        }
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error loading credentials: $e');
-      }
-    }
-  }
-
-  Future<void> saveCredentials() async {
-    try {
-      await LocalStorage.saveData(
-          'openai_api_key', apiKeyController.text.trim());
-      await LocalStorage.saveData('selected_language', selectedLanguage);
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error saving credentials: $e');
-      }
     }
   }
 
@@ -174,8 +141,8 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     }
     setState(() => isGettingSuggestedAnswer = true);
     try {
-      final response = await llmCall(
-          prompts.getSuggestedAnswerMessages(currentTopic), 1000);
+      final response =
+          await llmCall(prompts.getSuggestedAnswerMessages(currentTopic), 1000);
 
       setState(() {
         suggestedAnswer = response ?? "No suggestion generated.";
@@ -255,7 +222,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
                   const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: () async {
-                      await saveCredentials();
+                      // await saveCredentials();
                       // Switch to the Writing Task tab
                       _tabController.animateTo(1);
                     },

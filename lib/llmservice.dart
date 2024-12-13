@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'api_key.dart';
 
-// import 'package:huggingface_client/huggingface_client.dart';
-
 Future<String?> askLLM(
   String url,
   String apiKey,
@@ -58,20 +56,4 @@ Future<String?> askLLMHF(
   bool stream = false,
 }) async {
   return askLLM(hfLink, hfApiKey, hfModelName, messages, maxTokens);
-  // final client = HuggingFaceClient.getInferenceClient(
-  //     hfApiKey, HuggingFaceClient.inferenceBasePath);
-
-  // final apiInstance = InferenceApi(client);
-
-  // final result = await apiInstance.chatCompletion(
-  //     query: ApiQueryChatCompletion(
-  //       message: messages,
-  //       model: hfModelName,
-  //       temperature: temperature,
-  //       maxLength : maxTokens,
-  //       stream: stream,
-  //     ),
-  //     );
-
-  // return result?.choices[0].message.content;
 }
