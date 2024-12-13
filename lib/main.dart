@@ -73,10 +73,6 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     super.dispose();
   }
 
-  bool checkEmptyOpenAI() {
-    return true;
-  }
-
   bool checkCurrentTopicNotEmpty() {
     if (currentTopic.isEmpty) {
       setState(() {
@@ -90,9 +86,6 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
 
   Future<void> generateTopic() async {
     try {
-      if (!checkEmptyOpenAI()) {
-        return;
-      }
       setState(() => isGeneratingTopic = true);
       try {
         final response = await llmCall(prompts.getGenerateTopicsMessages, 500);
@@ -116,7 +109,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   }
 
   Future<void> evaluateResponse() async {
-    if (!checkEmptyOpenAI() || !checkCurrentTopicNotEmpty()) {
+    if (!checkCurrentTopicNotEmpty()) {
       return;
     }
     setState(() => isEvaluatingResponse = true);
@@ -136,7 +129,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   }
 
   Future<void> getSuggestedAnswer() async {
-    if (!checkEmptyOpenAI() || !checkCurrentTopicNotEmpty()) {
+    if (!checkCurrentTopicNotEmpty()) {
       return;
     }
     setState(() => isGettingSuggestedAnswer = true);
@@ -158,7 +151,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   }
 
   Future<void> getSuggestedIdea() async {
-    if (!checkEmptyOpenAI() || !checkCurrentTopicNotEmpty()) {
+    if (!checkCurrentTopicNotEmpty()) {
       return;
     }
     setState(() => isGettingSuggestedIdea = true);
@@ -270,20 +263,40 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
                   ),
                   buildCard(context, "Evaluation", evaluation),
                   const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: isGettingSuggestedIdea ? null : getSuggestedIdea,
-                    child: isGettingSuggestedIdea
-                        ? const CircularProgressIndicator()
-                        : const Text("Suggest Idea"),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed:
-                        isGettingSuggestedAnswer ? null : getSuggestedAnswer,
-                    child: isGettingSuggestedAnswer
-                        ? const CircularProgressIndicator()
-                        : const Text("Suggest an Answer"),
-                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Column(
+                        children: [
+                          ElevatedButton(
+                            onPressed: isGettingSuggestedIdea
+                                ? null
+                                : getSuggestedIdea,
+                            child: isGettingSuggestedIdea
+                                ? const CircularProgressIndicator()
+                                : const Text("Suggest Idea"),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          const SizedBox(width: 10),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          ElevatedButton(
+                            onPressed: isGettingSuggestedAnswer
+                                ? null
+                                : getSuggestedAnswer,
+                            child: isGettingSuggestedAnswer
+                                ? const CircularProgressIndicator()
+                                : const Text("Suggest an Answer"),
+                          ),
+                        ],
+                      )
+                    ],
+                  )
                 ],
               ),
             ),
@@ -298,7 +311,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
                   buildCard(context, "Current Topic", currentTopic),
                   const SizedBox(height: 10),
                   buildCard(context, "Suggested Ideas", suggestedIdea),
-                  const SizedBox(height: 10),
+                  const SizedBox(width: 10),
                   buildCard(context, "Suggested Answer", suggestedAnswer),
                 ],
               ),
