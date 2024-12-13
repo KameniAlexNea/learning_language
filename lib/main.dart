@@ -33,6 +33,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     with SingleTickerProviderStateMixin {
   final TextEditingController apiKeyController = TextEditingController();
   String selectedLanguage = "English"; // Default language
+  List<String> languages = ["English", "French", "Spanish"];
   String errorMessage = "";
   String currentTopic = "";
   String evaluation = "";
@@ -49,7 +50,6 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   late Prompts prompts = Prompts("English");
   late TabController _tabController;
 
-  final String openaiUrl = "https://api.openai.com/v1/chat/completions";
   String openaiApiKey = ""; // For holding the API key temporarily
 
   @override
@@ -81,6 +81,22 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     }
   }
 
+  Future<void> saveCredentials() async {
+    try {
+      await LocalStorage.saveData(
+          'openai_api_key', apiKeyController.text.trim());
+      await LocalStorage.saveData('selected_language', selectedLanguage);
+
+      setState(() {
+        openaiApiKey = apiKeyController.text.trim();
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error saving credentials: $e');
+      }
+    }
+  }
+
   @override
   void dispose() {
     _tabController.dispose();
@@ -102,7 +118,8 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   bool checkCurrentTopicNotEmpty() {
     if (currentTopic.isEmpty) {
       setState(() {
-        errorMessage = "Current topic cannot be empty. Please, first generate a topic";
+        errorMessage =
+            "Current topic cannot be empty. Please, first generate a topic";
       });
       return false;
     }
@@ -116,8 +133,8 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
       }
       setState(() => isGeneratingTopic = true);
       try {
-        final response = await askLLM(prompts.MODEL_NAME, openaiApiKey,
-            openaiUrl, prompts.getGenerateTopicsMessages, 500);
+        final response = await askLLM(
+            prompts.MODEL_NAME, prompts.getGenerateTopicsMessages, 500);
 
         final data = jsonDecode(utf8.decode(response.bodyBytes));
 
@@ -156,8 +173,6 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     try {
       final response = await askLLM(
           prompts.MODEL_NAME,
-          openaiApiKey,
-          openaiUrl,
           prompts.getEvaluateResponseMessages(
               currentTopic, responseController.text),
           1000);
@@ -185,7 +200,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     }
     setState(() => isGettingSuggestedAnswer = true);
     try {
-      final response = await askLLM(prompts.MODEL_NAME, openaiApiKey, openaiUrl,
+      final response = await askLLM(prompts.MODEL_NAME,
           prompts.getSuggestedAnswerMessages(currentTopic), 1000);
 
       final data = jsonDecode(utf8.decode(response.bodyBytes));
@@ -213,7 +228,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     }
     setState(() => isGettingSuggestedIdea = true);
     try {
-      final response = await askLLM(prompts.MODEL_NAME, openaiApiKey, openaiUrl,
+      final response = await askLLM(prompts.MODEL_NAME,
           prompts.getSuggestedIdeaMessages(currentTopic), 1000);
 
       final data = jsonDecode(utf8.decode(response.bodyBytes));
@@ -285,7 +300,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
                         prompts = Prompts(selectedLanguage);
                       });
                     },
-                    items: ["English", "French", "Spanish"]
+                    items: languages
                         .map((lang) => DropdownMenuItem(
                               value: lang,
                               child: Text(lang),
@@ -299,8 +314,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
                   const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: () async {
-                      openaiApiKey = apiKeyController.text.trim();
-                      await saveCredentials(openaiApiKey, selectedLanguage);
+                      await saveCredentials();
                       // Switch to the Writing Task tab
                       _tabController.animateTo(1);
                     },

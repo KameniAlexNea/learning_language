@@ -140,3 +140,4 @@ app.*.symbols
 !.vscode/settings.json
 
 .env
+lib/api_key.dart

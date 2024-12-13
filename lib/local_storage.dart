@@ -39,30 +39,3 @@ class LocalStorage {
   }
 }
 
-Future<Map<String, String?>> loadSavedCredentials() async {
-  // try {
-  final savedApiKey = await LocalStorage.readData('openai_api_key');
-  final savedLanguage = await LocalStorage.readData('selected_language');
-
-  return {"api": savedApiKey, "lang": savedLanguage};
-  // } catch (e) {
-  //   if (kDebugMode) {
-  //     print('Error loading credentials: $e');
-  //   }
-  // }
-}
-
-Future<void> saveCredentials(api, lang) async {
-  // try {
-  await LocalStorage.saveData('openai_api_key', api);
-  await LocalStorage.saveData('selected_language', lang);
-
-  //   setState(() {
-  //     openaiApiKey = apiKeyController.text.trim();
-  //   });
-  // } catch (e) {
-  //   if (kDebugMode) {
-  //     print('Error saving credentials: $e');
-  //   }
-  // }
-}
