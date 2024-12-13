@@ -33,8 +33,9 @@ dependencies:
   http: ^1.2.2
   flutter_markdown: ^0.7.4+3
   path_provider: ^2.1.1
-  huggingface_client: ^1.6.0
-  huggingface_dart: ^0.0.2
+  # huggingface_client: ^1.6.0
+  # huggingface_dart: ^0.0.2
+  # groq: ^0.0.7
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -63,6 +64,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - .env
 
   # To add assets to your application, add an assets section, like this:
   # assets:

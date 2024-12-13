@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'dart:convert';
 import 'dart:io';
 import 'prompts.dart';
 import 'llmservice.dart';
@@ -45,18 +44,25 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   bool isEvaluatingResponse = false;
   bool isGettingSuggestedAnswer = false;
   bool isGettingSuggestedIdea = false;
-  bool _obscureApiKey = true;
+  // bool _obscureApiKey = true;
 
   late Prompts prompts = Prompts("English");
   late TabController _tabController;
-
-  String openaiApiKey = ""; // For holding the API key temporarily
+  late Function llmCall;
+  final modelType = 2; // 0: OpenAI, 1: HF, 2: Groq
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _loadSavedCredentials();
+    if (modelType == 0) {
+      llmCall = askLLMOA;
+    } else if (modelType == 1) {
+      llmCall = askLLMHF;
+    } else {
+      llmCall = askLLMGroq;
+    }
   }
 
   Future<void> _loadSavedCredentials() async {
@@ -66,7 +72,6 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
 
       setState(() {
         if (savedApiKey != null) {
-          openaiApiKey = savedApiKey;
           apiKeyController.text = savedApiKey;
         }
         if (savedLanguage != null) {
@@ -86,10 +91,6 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
       await LocalStorage.saveData(
           'openai_api_key', apiKeyController.text.trim());
       await LocalStorage.saveData('selected_language', selectedLanguage);
-
-      setState(() {
-        openaiApiKey = apiKeyController.text.trim();
-      });
     } catch (e) {
       if (kDebugMode) {
         print('Error saving credentials: $e');
@@ -106,12 +107,6 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   }
 
   bool checkEmptyOpenAI() {
-    if (openaiApiKey.isEmpty) {
-      setState(() {
-        errorMessage = "OpenAI key cannot be empty";
-      });
-      return false;
-    }
     return true;
   }
 
@@ -133,23 +128,11 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
       }
       setState(() => isGeneratingTopic = true);
       try {
-        final response = await askLLM(
-            prompts.MODEL_NAME, prompts.getGenerateTopicsMessages, 500);
-
-        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        final response = await llmCall(prompts.getGenerateTopicsMessages, 500);
 
         setState(() {
-          if (response.statusCode == 200) {
-            currentTopic = data['choices'][0]['message']['content'] ??
-                "No topic generated.";
-            errorMessage = "";
-          } else {
-            final errorData = jsonDecode(response.body);
-            setState(() {
-              errorMessage = errorData['error']['message'] ??
-                  "HTTP ${response.statusCode}: Failed to generate topic.";
-            });
-          }
+          currentTopic = response ?? "No topic generated.";
+          errorMessage = "";
         });
       } on SocketException catch (e) {
         setState(() {
@@ -171,23 +154,14 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     }
     setState(() => isEvaluatingResponse = true);
     try {
-      final response = await askLLM(
-          prompts.MODEL_NAME,
+      final response = await llmCall(
           prompts.getEvaluateResponseMessages(
               currentTopic, responseController.text),
           1000);
 
-      final data = jsonDecode(utf8.decode(response.bodyBytes));
-
       setState(() {
-        if (response.statusCode == 200) {
-          evaluation = data['choices'][0]['message']['content'] ??
-              "No evaluation generated.";
-          errorMessage = "";
-        } else {
-          errorMessage =
-              data['error']['message'] ?? "Failed to evaluate response.";
-        }
+        evaluation = response ?? "No evaluation generated.";
+        errorMessage = "";
       });
     } finally {
       setState(() => isEvaluatingResponse = false);
@@ -200,21 +174,15 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     }
     setState(() => isGettingSuggestedAnswer = true);
     try {
-      final response = await askLLM(prompts.MODEL_NAME,
+      final response = await llmCall(
           prompts.getSuggestedAnswerMessages(currentTopic), 1000);
 
-      final data = jsonDecode(utf8.decode(response.bodyBytes));
-
       setState(() {
-        if (response.statusCode == 200) {
-          suggestedAnswer = data['choices'][0]['message']['content'] ??
-              "No suggestion generated.";
-          errorMessage = "";
-          // Switch to the Suggested Answer tab
+        suggestedAnswer = response ?? "No suggestion generated.";
+        errorMessage = "";
+        // Switch to the Suggested Answer tab
+        if (response != null) {
           _tabController.animateTo(2);
-        } else {
-          errorMessage =
-              data['error']['message'] ?? "Failed to generate suggestion.";
         }
       });
     } finally {
@@ -228,22 +196,14 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     }
     setState(() => isGettingSuggestedIdea = true);
     try {
-      final response = await askLLM(prompts.MODEL_NAME,
-          prompts.getSuggestedIdeaMessages(currentTopic), 1000);
-
-      final data = jsonDecode(utf8.decode(response.bodyBytes));
+      final response =
+          await llmCall(prompts.getSuggestedIdeaMessages(currentTopic), 1000);
 
       setState(() {
-        if (response.statusCode == 200) {
-          suggestedIdea =
-              data['choices'][0]['message']['content'] ?? "No suggestion idea.";
-          errorMessage = "";
-          // Switch to the Suggested Answer tab
-          _tabController.animateTo(2);
-        } else {
-          errorMessage =
-              data['error']['message'] ?? "Failed to generate ideas.";
-        }
+        suggestedIdea = response ?? "No suggestion idea.";
+        errorMessage = "";
+        // Switch to the Suggested Answer tab
+        if (response != null) _tabController.animateTo(2);
       });
     } finally {
       setState(() => isGettingSuggestedIdea = false);
@@ -273,25 +233,6 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  TextField(
-                    controller: apiKeyController,
-                    obscureText: _obscureApiKey,
-                    decoration: InputDecoration(
-                      border: const OutlineInputBorder(),
-                      labelText: "OpenAI API Key",
-                      suffixIcon: IconButton(
-                        icon: Icon(_obscureApiKey
-                            ? Icons.visibility
-                            : Icons.visibility_off),
-                        onPressed: () {
-                          setState(() {
-                            _obscureApiKey = !_obscureApiKey;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
                   DropdownButtonFormField<String>(
                     value: selectedLanguage,
                     onChanged: (value) {

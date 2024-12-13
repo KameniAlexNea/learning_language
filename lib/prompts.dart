@@ -3,13 +3,11 @@ class Prompts {
 
   Prompts(this.language);
 
-  final String MODEL_NAME = "gpt-4o";
-
-  List<Map<String, dynamic>> get getGenerateTopicsMessages => [
+  List<Map<String, Object>> get getGenerateTopicsMessages => [
         {"role": "system", "content": systemPrompt},
       ];
 
-  List<Map<String, dynamic>> getEvaluateResponseMessages(
+  List<Map<String, Object>> getEvaluateResponseMessages(
           String currentTopic, String userResponse) =>
       [
         {"role": "system", "content": systemPrompt},
@@ -20,14 +18,13 @@ class Prompts {
         },
       ];
 
-  List<Map<String, dynamic>> getSuggestedAnswerMessages(String currentTopic) =>
-      [
+  List<Map<String, Object>> getSuggestedAnswerMessages(String currentTopic) => [
         {"role": "system", "content": answerSystemPrompt},
         {"role": "user", "content": "Topic:\n\n $currentTopic"},
         {"role": "system", "content": answerPrompt}
       ];
 
-  List<Map<String, dynamic>> getSuggestedIdeaMessages(String currentTopic) => [
+  List<Map<String, Object>> getSuggestedIdeaMessages(String currentTopic) => [
         {"role": "system", "content": answerSystemPrompt},
         {"role": "user", "content": "Topic:\n\n $currentTopic"},
         {"role": "system", "content": ideaPrompt}
