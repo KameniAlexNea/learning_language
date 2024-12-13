@@ -5,10 +5,37 @@ class Prompts {
 
   final String MODEL_NAME = "gpt-4o";
 
-  String get langSuffix =>
-      language.toLowerCase() != "english"
-          ? "\nYour answer should be written in **$language** even if the prompt is in English"
-          : "";
+  List<Map<String, dynamic>> get getGenerateTopicsMessages => [
+        {"role": "system", "content": systemPrompt},
+      ];
+
+  List<Map<String, dynamic>> getEvaluateResponseMessages(
+          String currentTopic, String userResponse) =>
+      [
+        {"role": "system", "content": systemPrompt},
+        {"role": "assistant", "content": currentTopic},
+        {
+          "role": "user",
+          "content": "$evaluationPrompt\n\nResponse: $userResponse"
+        },
+      ];
+
+  List<Map<String, dynamic>> getSuggestedAnswerMessages(String currentTopic) =>
+      [
+        {"role": "system", "content": answerSystemPrompt},
+        {"role": "user", "content": "Topic:\n\n $currentTopic"},
+        {"role": "system", "content": answerPrompt}
+      ];
+
+  List<Map<String, dynamic>> getSuggestedIdeaMessages(String currentTopic) => [
+        {"role": "system", "content": answerSystemPrompt},
+        {"role": "user", "content": "Topic:\n\n $currentTopic"},
+        {"role": "system", "content": ideaPrompt}
+      ];
+
+  String get langSuffix => language.toLowerCase() != "english"
+      ? "\nYour answer should be written in **$language** even if the prompt is in English"
+      : "";
 
   String get systemPrompt =>
       """You are an AI assistant tasked with suggesting a widely appealing writing topic along with a brief, insightful commentary. The goal is to provide an engaging topic that can stimulate creative thinking and is suited to diverse writing levels. Avoid overly common themes like "A day in the life of..." or object-focused topics. Instead, aim for themes that resonate broadly and invite exploration while remaining open-ended to encourage individual expression.
@@ -25,8 +52,7 @@ $langSuffix""";
       """You are an AI assistant tasked with generating a thoughtful and creative response that explores a given theme. Your goal is to provide an insightful and engaging exploration of the topic, considering various perspectives and implications.
 $langSuffix""";
 
-  String get answerPrompt =>
-      """To generate a thoughtful and creative response:
+  String get answerPrompt => """To generate a thoughtful and creative response:
 
 1. Take a moment to consider the topic from multiple angles. Think about its historical context, current relevance, potential future implications, and how it might relate to different fields of study or aspects of life.
 
@@ -49,7 +75,8 @@ Structure your response as follows:
 Remember, the goal is to provide a response that is both intellectually stimulating and creatively engaging. Aim to leave the reader with new insights or perspectives on the topic.
 $langSuffix""";
 
-  String get ideaPrompt => """To generate thoughtful and creative **main ideas** for a response:
+  String get ideaPrompt =>
+      """To generate thoughtful and creative **main ideas** for a response:
 
 1. Reflect on the topic from multiple perspectives, considering its historical context, current relevance, potential future implications, and connections to various fields of study or aspects of life. 
    

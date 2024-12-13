@@ -96,4 +96,4 @@ flutter:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/favicon.jpeg"  # Path to your app icon image
+  image_path: "assets/favicon.png"  # Path to your app icon image

@@ -2,11 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:io';
-import 'package:http/http.dart' as http;
-import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:flutter/services.dart';
 import 'prompts.dart';
+import 'llmservice.dart';
+import 'local_storage.dart';
+import 'builder.dart';
 
 void main() {
   runApp(const WritingAssistantApp());
@@ -20,43 +19,6 @@ class WritingAssistantApp extends StatelessWidget {
     return const MaterialApp(
       home: WritingAssistantScreen(),
     );
-  }
-}
-
-// Create a class to manage local storage
-class LocalStorage {
-  static Future<File> _getLocalFile(String filename) async {
-    final directory = await getApplicationDocumentsDirectory();
-    return File('${directory.path}/$filename');
-  }
-
-  static Future<void> saveData(String key, String value) async {
-    final file = await _getLocalFile('app_settings.json');
-
-    // Read existing data
-    Map<String, dynamic> data = {};
-    if (await file.exists()) {
-      String contents = await file.readAsString();
-      data = json.decode(contents);
-    }
-
-    // Update data
-    data[key] = value;
-
-    // Write back to file
-    await file.writeAsString(json.encode(data));
-  }
-
-  static Future<String?> readData(String key) async {
-    final file = await _getLocalFile('app_settings.json');
-
-    if (await file.exists()) {
-      String contents = await file.readAsString();
-      Map<String, dynamic> data = json.decode(contents);
-      return data[key];
-    }
-
-    return null;
   }
 }
 
@@ -119,22 +81,6 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     }
   }
 
-  Future<void> _saveCredentials() async {
-    try {
-      await LocalStorage.saveData(
-          'openai_api_key', apiKeyController.text.trim());
-      await LocalStorage.saveData('selected_language', selectedLanguage);
-
-      setState(() {
-        openaiApiKey = apiKeyController.text.trim();
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error saving credentials: $e');
-      }
-    }
-  }
-
   @override
   void dispose() {
     _tabController.dispose();
@@ -143,33 +89,35 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     super.dispose();
   }
 
+  bool checkEmptyOpenAI() {
+    if (openaiApiKey.isEmpty) {
+      setState(() {
+        errorMessage = "OpenAI key cannot be empty";
+      });
+      return false;
+    }
+    return true;
+  }
+
+  bool checkCurrentTopicNotEmpty() {
+    if (currentTopic.isEmpty) {
+      setState(() {
+        errorMessage = "Current topic cannot be empty. Please, first generate a topic";
+      });
+      return false;
+    }
+    return true;
+  }
+
   Future<void> generateTopic() async {
     try {
-      if (openaiApiKey.isEmpty) {
-        setState(() {
-          errorMessage = "OpenAI key cannot be empty";
-        });
+      if (!checkEmptyOpenAI()) {
         return;
       }
       setState(() => isGeneratingTopic = true);
       try {
-        final response = await http
-            .post(
-              Uri.parse(openaiUrl),
-              headers: {
-                "Authorization": "Bearer $openaiApiKey",
-                "Content-Type": "application/json",
-              },
-              body: utf8.encode(jsonEncode({
-                "model": prompts.MODEL_NAME,
-                "messages": [
-                  {"role": "system", "content": prompts.systemPrompt},
-                ],
-                "max_tokens": 500,
-                "temperature": 0.7,
-              })),
-            )
-            .timeout(const Duration(seconds: 60));
+        final response = await askLLM(prompts.MODEL_NAME, openaiApiKey,
+            openaiUrl, prompts.getGenerateTopicsMessages, 500);
 
         final data = jsonDecode(utf8.decode(response.bodyBytes));
 
@@ -201,41 +149,18 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   }
 
   Future<void> evaluateResponse() async {
-    if (openaiApiKey.isEmpty) {
-      setState(() {
-        errorMessage = "OpenAI key cannot be empty";
-      });
-      return;
-    }
-    if (currentTopic.isEmpty) {
-      setState(() {
-        errorMessage = "Current topic cannot be empty.";
-      });
+    if (!checkEmptyOpenAI() || !checkCurrentTopicNotEmpty()) {
       return;
     }
     setState(() => isEvaluatingResponse = true);
     try {
-      final response = await http.post(
-        Uri.parse(openaiUrl),
-        headers: {
-          "Authorization": "Bearer $openaiApiKey",
-          "Content-Type": "application/json",
-        },
-        body: utf8.encode(jsonEncode({
-          "model": prompts.MODEL_NAME,
-          "messages": [
-            {"role": "system", "content": prompts.systemPrompt},
-            {"role": "assistant", "content": currentTopic},
-            {
-              "role": "user",
-              "content":
-                  "${prompts.evaluationPrompt}\n\nResponse: ${responseController.text}"
-            },
-          ],
-          "max_tokens": 1000,
-          "temperature": 0.7,
-        })),
-      );
+      final response = await askLLM(
+          prompts.MODEL_NAME,
+          openaiApiKey,
+          openaiUrl,
+          prompts.getEvaluateResponseMessages(
+              currentTopic, responseController.text),
+          1000);
 
       final data = jsonDecode(utf8.decode(response.bodyBytes));
 
@@ -255,37 +180,13 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   }
 
   Future<void> getSuggestedAnswer() async {
-    if (openaiApiKey.isEmpty) {
-      setState(() {
-        errorMessage = "OpenAI key cannot be empty";
-      });
-      return;
-    }
-    if (currentTopic.isEmpty) {
-      setState(() {
-        errorMessage = "Current topic cannot be empty.";
-      });
+    if (!checkEmptyOpenAI() || !checkCurrentTopicNotEmpty()) {
       return;
     }
     setState(() => isGettingSuggestedAnswer = true);
     try {
-      final response = await http.post(
-        Uri.parse(openaiUrl),
-        headers: {
-          "Authorization": "Bearer $openaiApiKey",
-          "Content-Type": "application/json",
-        },
-        body: utf8.encode(jsonEncode({
-          "model": prompts.MODEL_NAME,
-          "messages": [
-            {"role": "system", "content": prompts.answerSystemPrompt},
-            {"role": "user", "content": "Topic:\n\n $currentTopic"},
-            {"role": "system", "content": prompts.answerPrompt}
-          ],
-          "max_tokens": 1000,
-          "temperature": 0.7,
-        })),
-      );
+      final response = await askLLM(prompts.MODEL_NAME, openaiApiKey, openaiUrl,
+          prompts.getSuggestedAnswerMessages(currentTopic), 1000);
 
       final data = jsonDecode(utf8.decode(response.bodyBytes));
 
@@ -307,37 +208,13 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   }
 
   Future<void> getSuggestedIdea() async {
-    if (openaiApiKey.isEmpty) {
-      setState(() {
-        errorMessage = "OpenAI key cannot be empty";
-      });
-      return;
-    }
-    if (currentTopic.isEmpty) {
-      setState(() {
-        errorMessage = "Current topic cannot be empty.";
-      });
+    if (!checkEmptyOpenAI() || !checkCurrentTopicNotEmpty()) {
       return;
     }
     setState(() => isGettingSuggestedIdea = true);
     try {
-      final response = await http.post(
-        Uri.parse(openaiUrl),
-        headers: {
-          "Authorization": "Bearer $openaiApiKey",
-          "Content-Type": "application/json",
-        },
-        body: utf8.encode(jsonEncode({
-          "model": prompts.MODEL_NAME,
-          "messages": [
-            {"role": "system", "content": prompts.answerSystemPrompt},
-            {"role": "user", "content": "Topic:\n\n $currentTopic"},
-            {"role": "system", "content": prompts.ideaPrompt}
-          ],
-          "max_tokens": 1000,
-          "temperature": 0.0,
-        })),
-      );
+      final response = await askLLM(prompts.MODEL_NAME, openaiApiKey, openaiUrl,
+          prompts.getSuggestedIdeaMessages(currentTopic), 1000);
 
       final data = jsonDecode(utf8.decode(response.bodyBytes));
 
@@ -356,42 +233,6 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     } finally {
       setState(() => isGettingSuggestedIdea = false);
     }
-  }
-
-  Widget buildCard(String title, String content, {Color? backgroundColor}) {
-    return GestureDetector(
-      onLongPress: () {
-        Clipboard.setData(ClipboardData(text: content));
-        // Optionally show a message to the user after copying
-        // You can integrate a snackbar or toast here
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Content copied to clipboard!')),
-        );
-      },
-      child: Card(
-        color: backgroundColor ?? Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              MarkdownBody(
-                data: content,
-                styleSheet: MarkdownStyleSheet(
-                  p: const TextStyle(fontSize: 14),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -458,7 +299,8 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
                   const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: () async {
-                      await _saveCredentials();
+                      openaiApiKey = apiKeyController.text.trim();
+                      await saveCredentials(openaiApiKey, selectedLanguage);
                       // Switch to the Writing Task tab
                       _tabController.animateTo(1);
                     },
@@ -487,7 +329,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
                       style: const TextStyle(color: Colors.red),
                     ),
                   const SizedBox(height: 10),
-                  buildCard("Current Topic", currentTopic),
+                  buildCard(context, "Current Topic", currentTopic),
                   const SizedBox(height: 10),
                   TextField(
                     controller: responseController,
@@ -504,7 +346,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
                         ? const CircularProgressIndicator()
                         : const Text("Evaluate Response"),
                   ),
-                  buildCard("Evaluation", evaluation),
+                  buildCard(context, "Evaluation", evaluation),
                   const SizedBox(height: 10),
                   ElevatedButton(
                     onPressed: isGettingSuggestedIdea ? null : getSuggestedIdea,
@@ -531,11 +373,11 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  buildCard("Current Topic", currentTopic),
+                  buildCard(context, "Current Topic", currentTopic),
                   const SizedBox(height: 10),
-                  buildCard("Suggested Ideas", suggestedIdea),
+                  buildCard(context, "Suggested Ideas", suggestedIdea),
                   const SizedBox(height: 10),
-                  buildCard("Suggested Answer", suggestedAnswer),
+                  buildCard(context, "Suggested Answer", suggestedAnswer),
                 ],
               ),
             ),
