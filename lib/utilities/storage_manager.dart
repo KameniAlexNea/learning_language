@@ -1,23 +1,35 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-Future<List<String>> loadThemes() async {
-  final prefs = await SharedPreferences.getInstance();
-  final savedThemes = prefs.getStringList('selectedThemes') ?? [];
-  return savedThemes;
-}
+class PreferencesManager {
+  static final PreferencesManager _instance = PreferencesManager._internal();
+  SharedPreferences? _prefs;
 
-Future<void> saveThemes(List<String> themes) async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setStringList('selectedThemes', themes);
-}
+  PreferencesManager._internal();
 
-Future<void> saveLanguage(String lang) async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setString('language', lang);
-}
+  static PreferencesManager get instance => _instance;
 
-Future<String> loadLanguage() async {
-  final prefs = await SharedPreferences.getInstance();
-  final lang = prefs.getString('language') ?? "";
-  return lang;
+  // Initialize the SharedPreferences instance
+  Future<void> init() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
+
+  // Save themes
+  Future<void> saveThemes(List<String> themes) async {
+    await _prefs?.setStringList('selectedThemes', themes);
+  }
+
+  // Load themes
+  List<String> loadThemes() {
+    return _prefs?.getStringList('selectedThemes') ?? [];
+  }
+
+  // Save language
+  Future<void> saveLanguage(String lang) async {
+    await _prefs?.setString('language', lang);
+  }
+
+  // Load language
+  String loadLanguage() {
+    return _prefs?.getString('language') ?? "";
+  }
 }

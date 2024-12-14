@@ -31,14 +31,14 @@ class _ThemeSelectorScreenState extends State<ThemeSelectorScreen> {
   }
 
   Future<void> _loadPreferences() async {
-    final savedThemes = await loadThemes();
+    final savedThemes = PreferencesManager.instance.loadThemes();
     setState(() {
       selectedThemes.addAll(savedThemes);
     });
   }
 
   Future<void> _savePreferences() async {
-    saveThemes(selectedThemes.toList());
+    PreferencesManager.instance.saveThemes(selectedThemes.toList());
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Preferences saved!')),
     );
@@ -89,15 +89,6 @@ class _ThemeSelectorScreenState extends State<ThemeSelectorScreen> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          children: [
-            ElevatedButton(
-              onPressed: _savePreferences,
-              child: Text('Save Preferences'),
-            ),
-          ],
-        ),
-        SizedBox(height: 16.0),
         Row(
           children: [
             Expanded(
@@ -162,7 +153,7 @@ class _ThemeSelectorScreenState extends State<ThemeSelectorScreen> {
                   duration: Duration(milliseconds: 300),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? Colors.blue.withOpacity(0.8)
+                        ? Colors.blue.withAlpha((0.8 * 255).round())
                         : Colors.grey[200],
                     borderRadius: BorderRadius.circular(16.0),
                     border: Border.all(

@@ -1,11 +1,24 @@
+import 'storage_manager.dart';
+
 class Prompts {
   final String language;
 
   Prompts(this.language);
 
-  List<Map<String, Object>> get getGenerateTopicsMessages => [
-        {"role": "system", "content": systemPrompt},
-      ];
+  List<Map<String, Object>> get getGenerateTopicsMessages {
+    final themes = PreferencesManager.instance.loadThemes();
+    final hasPreferences = themes.isNotEmpty;
+    final preferenceMessage = hasPreferences
+        ? "These are the user's preferences for discussion: ${themes.join(", ")}. The user maybe more engaged to discuss these subjects"
+        : "The user didn't set a preference for subjects.";
+
+    return [
+      {
+        "role": "system",
+        "content": systemPrompt + preferenceMessage,
+      },
+    ];
+  }
 
   List<Map<String, Object>> getEvaluateResponseMessages(
           String currentTopic, String userResponse) =>
