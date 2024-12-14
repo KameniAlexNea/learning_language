@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:string_similarity/string_similarity.dart';
 
+import '../utilities/storage_manager.dart';
 
 class ThemeSelectorScreen extends StatefulWidget {
   const ThemeSelectorScreen({super.key});
 
   @override
-  ThemeSelectorScreenState createState() => ThemeSelectorScreenState();
+  _ThemeSelectorScreenState createState() => _ThemeSelectorScreenState();
 }
 
-class ThemeSelectorScreenState extends State<ThemeSelectorScreen> {
+class _ThemeSelectorScreenState extends State<ThemeSelectorScreen> {
   final List<String> themes = [
     'Informatic',
     'Science',
@@ -31,16 +31,17 @@ class ThemeSelectorScreenState extends State<ThemeSelectorScreen> {
   }
 
   Future<void> _loadPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedThemes = prefs.getStringList('selectedThemes') ?? [];
+    final savedThemes = await loadThemes();
     setState(() {
       selectedThemes.addAll(savedThemes);
     });
   }
 
   Future<void> _savePreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList('selectedThemes', selectedThemes.toList());
+    saveThemes(selectedThemes.toList());
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Preferences saved!')),
+    );
   }
 
   void toggleSelection(String themeName) {
@@ -160,7 +161,9 @@ class ThemeSelectorScreenState extends State<ThemeSelectorScreen> {
                 child: AnimatedContainer(
                   duration: Duration(milliseconds: 300),
                   decoration: BoxDecoration(
-                    color: isSelected ? Colors.blue.withOpacity(0.8) : Colors.grey[200],
+                    color: isSelected
+                        ? Colors.blue.withOpacity(0.8)
+                        : Colors.grey[200],
                     borderRadius: BorderRadius.circular(16.0),
                     border: Border.all(
                       color: isSelected ? Colors.blue : Colors.grey,

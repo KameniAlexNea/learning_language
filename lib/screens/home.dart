@@ -207,14 +207,14 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
                     ),
                   ),
                   const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () async {
-                      // await saveCredentials();
-                      // Switch to the Writing Task tab
-                      _tabController.animateTo(1);
-                    },
-                    child: const Text("Save Language"),
-                  ),
+                  // ElevatedButton(
+                  //   onPressed: () async {
+                  //     // await saveCredentials();
+                  //     // Switch to the Writing Task tab
+                  //     _tabController.animateTo(1);
+                  //   },
+                  //   child: const Text("Save Language"),
+                  // ),
                   themeSelector
                 ],
               ),
