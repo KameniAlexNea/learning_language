@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'api_key.dart';
+import '../utilities/api_key.dart';
 
 Future<String?> askLLM(
   String url,
