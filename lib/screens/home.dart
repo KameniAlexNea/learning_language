@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import '../widgets/builder.dart';
 import '../api/llmservice.dart';
-
+import './themeselector.dart';
 
 
 
@@ -25,6 +25,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   String suggestedAnswer = "";
   String suggestedIdea = "";
   TextEditingController responseController = TextEditingController();
+  ThemeSelectorScreen themeSelector = ThemeSelectorScreen();
 
   bool isGeneratingTopic = false;
   bool isEvaluatingResponse = false;
@@ -212,8 +213,9 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
                       // Switch to the Writing Task tab
                       _tabController.animateTo(1);
                     },
-                    child: const Text("Save API Key & Language"),
+                    child: const Text("Save Language"),
                   ),
+                  themeSelector
                 ],
               ),
             ),
