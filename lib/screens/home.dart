@@ -212,21 +212,46 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(
-                        icon: const Icon(LucideIcons.plus),
-                        onPressed: isGeneratingTopic ? null : generateTopic,
+                      Column(
+                        children: [
+                          IconButton(
+                            icon: const Icon(LucideIcons.plus),
+                            onPressed: isGeneratingTopic ? null : generateTopic,
+                          ),
+                          const Text("Generate"),
+                        ],
                       ),
-                      IconButton(
-                        icon: const Icon(LucideIcons.checkCircle),
-                        onPressed: isEvaluatingResponse ? null : evaluateResponse,
+                      Column(
+                        children: [
+                          IconButton(
+                            icon: const Icon(LucideIcons.checkCircle),
+                            onPressed:
+                                isEvaluatingResponse ? null : evaluateResponse,
+                          ),
+                          const Text("Evaluate"),
+                        ],
                       ),
-                      IconButton(
-                        icon: const Icon(LucideIcons.lightbulb),
-                        onPressed: isGettingSuggestedIdea ? null : getSuggestedIdea,
+                      Column(
+                        children: [
+                          IconButton(
+                            icon: const Icon(LucideIcons.lightbulb),
+                            onPressed: isGettingSuggestedIdea
+                                ? null
+                                : getSuggestedIdea,
+                          ),
+                          const Text("Idea"),
+                        ],
                       ),
-                      IconButton(
-                        icon: const Icon(LucideIcons.messageCircle),
-                        onPressed: isGettingSuggestedAnswer ? null : getSuggestedAnswer,
+                      Column(
+                        children: [
+                          IconButton(
+                            icon: const Icon(LucideIcons.messageCircle),
+                            onPressed: isGettingSuggestedAnswer
+                                ? null
+                                : getSuggestedAnswer,
+                          ),
+                          const Text("Answer"),
+                        ],
                       ),
                     ],
                   ),
