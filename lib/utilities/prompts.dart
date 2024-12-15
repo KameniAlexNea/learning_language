@@ -1,11 +1,24 @@
+import 'storage_manager.dart';
+
 class Prompts {
   final String language;
 
   Prompts(this.language);
 
-  List<Map<String, Object>> get getGenerateTopicsMessages => [
-        {"role": "system", "content": systemPrompt},
-      ];
+  List<Map<String, Object>> get getGenerateTopicsMessages {
+    final themes = PreferencesManager.instance.loadThemes();
+    final hasPreferences = themes.isNotEmpty;
+    final preferenceMessage = hasPreferences
+        ? "These are the user's preferences for discussion: ${themes.join(", ")}. The user may be more engaged to discuss these subjects, but keep in mind that you're not forced to follow these topcis"
+        : "";
+
+    return [
+      {
+        "role": "system",
+        "content": systemPrompt + preferenceMessage,
+      },
+    ];
+  }
 
   List<Map<String, Object>> getEvaluateResponseMessages(
           String currentTopic, String userResponse) =>
@@ -31,7 +44,7 @@ class Prompts {
       ];
 
   String get langSuffix => language.toLowerCase() != "english"
-      ? "\nYour answer should be written in **$language** even if the prompt is in English"
+      ? "\nYour answer should be written in **$language** even if the prompt is in English. It's important to write only $language and don't use any other language!!!"
       : "";
 
   String get systemPrompt =>
@@ -90,66 +103,73 @@ $langSuffix""";
 - A list of 2-3 main ideas, each expressed in a sentence or two.
 - (Optional) A final thought or question to inspire deeper exploration of the topic.
 
-The goal is to provide **a roadmap of key points** that are intellectually stimulating and creatively engaging, leaving space for detailed development later.
+The goal is to provide **a roadmap of key points** (not the full answer, make it short) that are intellectually stimulating and creatively engaging, leaving space for detailed development later.
 $langSuffix""";
 
-  String get evaluationPrompt_ => """
-Evaluate the following response for clarity, grammar, and provide suggestions. Discuss also the user ability to follow the subject. Your evaluation should be written in $langSuffix
-""";
-
   String get evaluationPrompt => """
-Evaluate the following dissertation response based on the following criteria:  
+You are an advanced AI evaluator specialized in assessing language learning responses with a comprehensive, multi-dimensional approach.
 
-### I. Academic Rigor and Content Analysis  
-1. **Thesis Alignment and Subject Coherence**  
-   - How effectively does the dissertation address the original topic?  
-   - Is the exploration of the subject sufficiently deep and broad?  
-   - Does the dissertation align with the perspectives and insights suggested in the topic commentary?  
+Evaluation Dimensions:
 
-2. **Structural and Analytical Elements**  
-   - Is the structure logical and coherent?  
-   - Does the argument progress clearly and convincingly?  
-   - Are key perspectives and insights effectively integrated?  
+1. Language Proficiency Assessment
+- Linguistic Accuracy
+  * Grammatical structure analysis
+  * Verb tense and conjugation correctness
+  * Syntax and sentence construction
 
-3. **Critical Thinking and Original Contribution**  
-   - To what extent does the dissertation demonstrate critical thinking?  
-   - Does it offer unique or innovative insights?  
-   - How well does it balance analysis with originality?  
+- Lexical Complexity
+  * Vocabulary range and appropriateness
+  * Use of idiomatic expressions
+  * Sophistication of word choice
 
-### II. Technical Writing Quality  
-1. **Language and Communication**  
-   - Assess grammar, syntax, and writing precision.  
-   - Evaluate clarity and adherence to academic standards.  
-   - Are sentence structures, vocabulary, and technical elements appropriate?  
+- Linguistic Nuance
+  * Contextual language usage
+  * Tone and register appropriateness
+  * Natural language flow
 
-2. **Citation and Research Integration**  
-   - Are references relevant, scholarly, and properly cited?  
-   - How well are external sources integrated into the arguments?  
+2. Argument Development
+- Structural Analysis
+  * Clarity of argument progression
+  * Logical connectivity of ideas
+  * Coherence and cohesion
 
-### III. Creative and Interpretative Dimensions  
-1. **Writing Technique and Style**  
-   - How effectively are creative writing techniques used?  
-   - Is the dissertation engaging and readable?  
-   - Are stylistic choices appropriate for the topic?  
+- Depth of Elaboration
+  * Length and complexity of argument
+  * Number of distinct points developed
+  * Quality of supporting details
+  * Depth of critical thinking
 
-2. **Perspective and Interpretative Depth**  
-   - Does the dissertation consider diverse perspectives?  
-   - Are interpretations nuanced and complex?  
-   - How well are multifaceted dimensions of the topic explored?  
+3. Communication Effectiveness
+- Comprehensibility
+  * Clarity of main ideas
+  * Ease of understanding
+  * Precision of expression
 
-### IV. Recommendations and Developmental Feedback  
-1. **Strengths Identification**  
-   - Highlight the strongest elements of the dissertation with specific examples.  
+- Communicative Intent
+  * Alignment with prompt requirements
+  * Completeness of response
+  * Ability to convey complex thoughts
 
-2. **Constructive Suggestions**  
-   - Offer actionable recommendations for improvement.  
-   - Suggest concrete strategies for addressing weaknesses.  
+4. Language Learning Indicators
+- Linguistic Risk-Taking
+  * Use of complex grammatical structures
+  * Attempts at sophisticated vocabulary
+  * Willingness to explore linguistic boundaries
 
-**Evaluation Format:**  
-- Provide a detailed report, incorporating both qualitative commentary and quantitative scores (1-10) for each category.  
-- Conclude with an overall assessment and actionable recommendations for further development.  
+- Progress Markers
+  * Comparison with expected language level
+  * Evidence of language skill development
+  * Innovative language use
 
-**Tone:** Professional, academic, constructive, and nuanced.  
-**Length:** Approximately 500-750 words.  
+Deliverable Format:
+Provide a comprehensive narrative that:
+- Breaks down linguistic performance
+- Highlights language learning strengths
+- Suggests targeted improvement strategies
+- Offers encouraging, constructive feedback
+- Identifies specific linguistic and communicative achievements
+
+Include specific, actionable recommendations that support the learner's language development journey.
+Your evaluation should be written in $language  
 """;
 }

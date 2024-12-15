@@ -1,11 +1,10 @@
 import 'package:discursia/utilities/prompts.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../widgets/builder.dart';
 import '../api/llmservice.dart';
-
-
-
+import './themeselector.dart';
 
 class WritingAssistantScreen extends StatefulWidget {
   const WritingAssistantScreen({super.key});
@@ -41,7 +40,6 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     super.initState();
 
     _tabController = TabController(length: 3, vsync: this);
-    // _loadSavedCredentials();
     if (modelType == 0) {
       llmCall = askLLMOA;
     } else if (modelType == 1) {
@@ -59,10 +57,6 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     super.dispose();
   }
 
-  bool checkEmptyOpenAI() {
-    return true;
-  }
-
   bool checkCurrentTopicNotEmpty() {
     if (currentTopic.isEmpty) {
       setState(() {
@@ -76,9 +70,6 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
 
   Future<void> generateTopic() async {
     try {
-      if (!checkEmptyOpenAI()) {
-        return;
-      }
       setState(() => isGeneratingTopic = true);
       try {
         final response = await llmCall(prompts.getGenerateTopicsMessages, 500);
@@ -102,7 +93,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   }
 
   Future<void> evaluateResponse() async {
-    if (!checkEmptyOpenAI() || !checkCurrentTopicNotEmpty()) {
+    if (!checkCurrentTopicNotEmpty()) {
       return;
     }
     setState(() => isEvaluatingResponse = true);
@@ -122,7 +113,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   }
 
   Future<void> getSuggestedAnswer() async {
-    if (!checkEmptyOpenAI() || !checkCurrentTopicNotEmpty()) {
+    if (!checkCurrentTopicNotEmpty()) {
       return;
     }
     setState(() => isGettingSuggestedAnswer = true);
@@ -144,7 +135,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   }
 
   Future<void> getSuggestedIdea() async {
-    if (!checkEmptyOpenAI() || !checkCurrentTopicNotEmpty()) {
+    if (!checkCurrentTopicNotEmpty()) {
       return;
     }
     setState(() => isGettingSuggestedIdea = true);
@@ -171,7 +162,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
-            Tab(icon: Icon(Icons.key), text: "API Key"),
+            Tab(icon: Icon(Icons.settings), text: "App Setting"),
             Tab(icon: Icon(Icons.article), text: "Writing Task"),
             Tab(icon: Icon(Icons.lightbulb), text: "Suggested Answer"),
           ],
@@ -206,14 +197,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
                     ),
                   ),
                   const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () async {
-                      // await saveCredentials();
-                      // Switch to the Writing Task tab
-                      _tabController.animateTo(1);
-                    },
-                    child: const Text("Save API Key & Language"),
-                  ),
+                  ThemeSelectorScreen()
                 ],
               ),
             ),
@@ -225,11 +209,51 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  ElevatedButton(
-                    onPressed: isGeneratingTopic ? null : generateTopic,
-                    child: isGeneratingTopic
-                        ? const CircularProgressIndicator()
-                        : const Text("Generate New Topic"),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        children: [
+                          IconButton(
+                            icon: const Icon(LucideIcons.plus),
+                            onPressed: isGeneratingTopic ? null : generateTopic,
+                          ),
+                          const Text("Generate"),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          IconButton(
+                            icon: const Icon(LucideIcons.checkCircle),
+                            onPressed:
+                                isEvaluatingResponse ? null : evaluateResponse,
+                          ),
+                          const Text("Evaluate"),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          IconButton(
+                            icon: const Icon(LucideIcons.lightbulb),
+                            onPressed: isGettingSuggestedIdea
+                                ? null
+                                : getSuggestedIdea,
+                          ),
+                          const Text("Idea"),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          IconButton(
+                            icon: const Icon(LucideIcons.messageCircle),
+                            onPressed: isGettingSuggestedAnswer
+                                ? null
+                                : getSuggestedAnswer,
+                          ),
+                          const Text("Answer"),
+                        ],
+                      ),
+                    ],
                   ),
                   if (errorMessage.isNotEmpty)
                     Text(
@@ -241,35 +265,21 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
                   const SizedBox(height: 10),
                   TextField(
                     controller: responseController,
-                    maxLines: 5,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: "Write your response here",
+                    maxLines: 200, // Makes it expandable for long text
+                    keyboardType: TextInputType.multiline,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      labelText: "Write your essay here",
+                      alignLabelWithHint: true, // Aligns label to top
                     ),
+                    style: TextStyle(fontSize: 16.0),
+                    textAlignVertical: TextAlignVertical.top,
+                    minLines: 5, // Starts with 5 lines
                   ),
                   const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: isEvaluatingResponse ? null : evaluateResponse,
-                    child: isEvaluatingResponse
-                        ? const CircularProgressIndicator()
-                        : const Text("Evaluate Response"),
-                  ),
                   buildCard(context, "Evaluation", evaluation),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: isGettingSuggestedIdea ? null : getSuggestedIdea,
-                    child: isGettingSuggestedIdea
-                        ? const CircularProgressIndicator()
-                        : const Text("Suggest Idea"),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed:
-                        isGettingSuggestedAnswer ? null : getSuggestedAnswer,
-                    child: isGettingSuggestedAnswer
-                        ? const CircularProgressIndicator()
-                        : const Text("Suggest an Answer"),
-                  ),
                 ],
               ),
             ),
