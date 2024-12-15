@@ -265,11 +265,18 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
                   const SizedBox(height: 10),
                   TextField(
                     controller: responseController,
-                    maxLines: 5,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: "Write your response here",
+                    maxLines: 200, // Makes it expandable for long text
+                    keyboardType: TextInputType.multiline,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      labelText: "Write your essay here",
+                      alignLabelWithHint: true, // Aligns label to top
                     ),
+                    style: TextStyle(fontSize: 16.0),
+                    textAlignVertical: TextAlignVertical.top,
+                    minLines: 5, // Starts with 5 lines
                   ),
                   const SizedBox(height: 10),
                   buildCard(context, "Evaluation", evaluation),

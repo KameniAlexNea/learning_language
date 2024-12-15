@@ -44,7 +44,7 @@ class Prompts {
       ];
 
   String get langSuffix => language.toLowerCase() != "english"
-      ? "\nYour answer should be written in **$language** even if the prompt is in English"
+      ? "\nYour answer should be written in **$language** even if the prompt is in English. It's important to write only $language and don't use any other language!!!"
       : "";
 
   String get systemPrompt =>

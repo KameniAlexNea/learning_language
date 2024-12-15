@@ -71,7 +71,7 @@ class _ThemeSelectorScreenState extends State<ThemeSelectorScreen> {
   }
 
   void suggestClosestTheme(String input) {
-    if (input.isEmpty) {
+    if (input.isEmpty || (input.length < 3)) {
       setState(() {
         suggestedTheme = '';
       });
@@ -96,48 +96,57 @@ class _ThemeSelectorScreenState extends State<ThemeSelectorScreen> {
                 controller: themeController,
                 decoration: InputDecoration(
                   labelText: 'Add Custom Theme',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  prefixIcon: Icon(Icons.edit),
                 ),
                 onChanged: suggestClosestTheme,
                 onSubmitted: (_) => addCustomTheme(),
               ),
             ),
             SizedBox(width: 8.0),
-            ElevatedButton(
+            ElevatedButton.icon(
               onPressed: addCustomTheme,
-              child: Text('Add'),
+              icon: Icon(Icons.add),
+              label: Text('Add'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+              ),
             ),
           ],
         ),
         if (suggestedTheme.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
-            child: GestureDetector(
-              onTap: () => toggleSelection(suggestedTheme),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Did you mean: ',
-                    style: TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                  Text(
-                    suggestedTheme,
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
-                      decoration: TextDecoration.underline,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Did you mean: ',
+                    style: TextStyle(fontWeight: FontWeight.w500)),
+                GestureDetector(
+                  onTap: () => toggleSelection(suggestedTheme),
+                  child: Chip(
+                    label: Text(
+                      suggestedTheme,
+                      style: TextStyle(color: Colors.blue),
                     ),
+                    backgroundColor: Colors.blue[50],
+                    avatar: Icon(Icons.add, color: Colors.blue),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         SizedBox(height: 16.0),
         Flexible(
           child: GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 200,
               crossAxisSpacing: 16.0,
               mainAxisSpacing: 16.0,
             ),
@@ -152,9 +161,21 @@ class _ThemeSelectorScreenState extends State<ThemeSelectorScreen> {
                 child: AnimatedContainer(
                   duration: Duration(milliseconds: 300),
                   decoration: BoxDecoration(
-                    color: isSelected
-                        ? Colors.blue.withAlpha((0.8 * 255).round())
-                        : Colors.grey[200],
+                    gradient: isSelected
+                        ? LinearGradient(
+                            colors: [Colors.blueAccent, Colors.blue],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          )
+                        : null,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 6.0,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                    color: isSelected ? null : Colors.grey[200],
                     borderRadius: BorderRadius.circular(16.0),
                     border: Border.all(
                       color: isSelected ? Colors.blue : Colors.grey,
