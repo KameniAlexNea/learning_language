@@ -79,7 +79,7 @@ Future<void> evaluateResponse() async {
       DiscusiaConfig.evaluation = response ?? "No evaluation generated.";
       DiscusiaConfig.errorMessage = "";
       if (response != null) {
-        DiscusiaConfig.tabController.animateTo(2);
+        DiscusiaConfig.tabController.animateTo(3);
       }
     });
   } finally {
@@ -152,8 +152,9 @@ Future<void> saveData() async {
         suggestedIdea: DiscusiaConfig.suggestedIdea,
         suggestedAnswer: DiscusiaConfig.suggestedAnswer);
 
-    DiscusiaConfig.setState(() => {
-      DiscusiaConfig.interactions.add(data)
+    DiscusiaConfig.setState(() {
+      DiscusiaConfig.interactions.add(data);
+      DiscusiaConfig.tabController.animateTo(4);
     });
   } finally {
     DiscusiaConfig.setState(() => DiscusiaConfig.isSavingState = false);

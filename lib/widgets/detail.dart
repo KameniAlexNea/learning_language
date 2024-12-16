@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../db/model.dart';
+import 'builder.dart';
 
 class DetailPage extends StatelessWidget {
   final DiscussionInteraction interaction;
@@ -9,22 +10,40 @@ class DetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Detail View")),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Theme: ${interaction.theme}", style: TextStyle(fontSize: 18)),
-            SizedBox(height: 10),
-            Text("User Answer:", style: TextStyle(fontWeight: FontWeight.bold)),
-            Text(interaction.userAnswer),
-            SizedBox(height: 20),
-            Text("Feedback:"),
-            Divider(),
-            SizedBox(height: 10),
-            Text(interaction.evaluation),
-          ],
+      appBar: AppBar(
+        title: Text("Interaction Details"),
+        elevation: 1,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Theme Section
+              buildCard(context, "Theme", interaction.theme),
+              
+              SizedBox(height: 16),
+              
+              // User Answer Section
+              buildCard(context, "Your Response", interaction.userAnswer),
+              
+              SizedBox(height: 16),
+              
+              // Feedback Section
+              buildCard(context, "Feedback", interaction.evaluation),
+              
+              // Date Information
+              SizedBox(height: 16),
+              Text(
+                "Date: ${interaction.date.toLocal().toString().split(' ')[0]}",
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

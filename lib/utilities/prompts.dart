@@ -139,7 +139,10 @@ Provide a clear, objective analysis highlighting:
 3. Specific areas requiring improvement
 4. Concrete suggestions for enhancement
 
-Focus on delivering precise, unbiased feedback that accurately assesses both content quality and language proficiency. Maintain a neutral tone while providing detailed observations and practical recommendations for improvement.
+Focus on delivering precise, unbiased feedback that accurately assesses both content quality and language proficiency. 
+Maintain a neutral tone while providing detailed observations and practical recommendations for improvement.
+Instead of general answer on issue, like they're some issue in your text, point directly the issue and propose an improvement if necessary.
+Don't evaluate user with mark like X/10, just explain what is good and bad in the written.
 $langSuffix  
 """;
 }
