@@ -78,6 +78,9 @@ Future<void> evaluateResponse() async {
     DiscusiaConfig.setState(() {
       DiscusiaConfig.evaluation = response ?? "No evaluation generated.";
       DiscusiaConfig.errorMessage = "";
+      if (response != null) {
+        DiscusiaConfig.tabController.animateTo(2);
+      }
     });
   } finally {
     DiscusiaConfig.setState(() => DiscusiaConfig.isEvaluatingResponse = false);

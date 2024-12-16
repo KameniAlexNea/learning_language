@@ -21,27 +21,10 @@ class _EvalScreenState extends State<EvalScreen> {
           children: [
             buildCard(
               context,
-              "Current Topic",
-              DiscusiaConfig.currentTopic,
+              "Evaluation",
+              DiscusiaConfig.evaluation,
               backgroundColor: Theme.of(context).colorScheme.surface,
               elevation: 2.0,
-            ),
-            const SizedBox(height: 16),
-            buildCard(
-              context,
-              "Suggested Ideas",
-              DiscusiaConfig.suggestedIdea,
-              backgroundColor:
-                  Theme.of(context).colorScheme.surfaceContainerHighest,
-              elevation: 1.0,
-            ),
-            const SizedBox(height: 16),
-            buildCard(
-              context,
-              "Suggested Answer",
-              DiscusiaConfig.suggestedAnswer,
-              backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-              elevation: 1.0,
             ),
           ],
         ),

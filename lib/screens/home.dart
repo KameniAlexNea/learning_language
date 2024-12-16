@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../api/llmservice.dart';
 import 'config_screen.dart';
 import 'eval_screen.dart';
+import 'suggest_screen.dart';
 import 'typing_screen.dart';
 
 class WritingAssistantScreen extends StatefulWidget {
@@ -23,7 +24,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     super.initState();
 
     DiscusiaConfig.setState = setState;
-    DiscusiaConfig.tabController = TabController(length: 3, vsync: this);
+    DiscusiaConfig.tabController = TabController(length: 4, vsync: this);
     if (DiscusiaConfig.modelType == 0) {
       DiscusiaConfig.llmCall = askLLMOA;
     } else if (DiscusiaConfig.modelType == 1) {
@@ -52,6 +53,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
             Tab(icon: Icon(Icons.settings), text: "App Setting"),
             Tab(icon: Icon(Icons.article), text: "Writing Task"),
             Tab(icon: Icon(Icons.lightbulb), text: "Suggested Answer"),
+            Tab(icon: Icon(Icons.score), text: "Evaluation"),
           ],
         ),
       ),
@@ -65,7 +67,10 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
           TypingScreen(),
 
           // Third Tab: Suggested Answer
-          EvalScreen(),
+          SuggestScreen(),
+
+          // Fourth Tab: Evaluation
+          EvalScreen()
         ],
       ),
     );
