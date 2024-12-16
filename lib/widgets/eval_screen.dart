@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../db/discusia.dart';
-import '../widgets/builder.dart';
+import 'builder.dart';
 
 class EvalScreen extends StatefulWidget {
   const EvalScreen({super.key});

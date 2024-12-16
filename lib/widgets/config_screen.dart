@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../db/discusia.dart';
 import '../utilities/prompts.dart';
-import './themeselector.dart';
+import 'themeselector.dart';
 
 class ConfigScreen extends StatefulWidget {
   const ConfigScreen({super.key});

@@ -1,10 +1,10 @@
 import 'package:discursia/db/discusia.dart';
 import 'package:flutter/material.dart';
 import '../api/llmservice.dart';
-import 'config_screen.dart';
-import 'eval_screen.dart';
-import 'suggest_screen.dart';
-import 'typing_screen.dart';
+import '../widgets/config_screen.dart';
+import '../widgets/eval_screen.dart';
+import '../widgets/suggest_screen.dart';
+import '../widgets/typing_screen.dart';
 
 class WritingAssistantScreen extends StatefulWidget {
   const WritingAssistantScreen({super.key});
