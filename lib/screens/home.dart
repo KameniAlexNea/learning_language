@@ -17,7 +17,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     with SingleTickerProviderStateMixin {
   final TextEditingController apiKeyController = TextEditingController();
   String selectedLanguage = "English"; // Default language
-  List<String> languages = ["English", "French", "Spanish"];
+  List<String> languages = ["English", "German", "French", "Italian", "Portuguese", "Hindi", "Spanish", "Thai"]; // supported lang of llama3.3
   String errorMessage = "";
   String currentTopic = "";
   String evaluation = "";
