@@ -1,6 +1,8 @@
 import '../utilities/prompts.dart';
 import 'package:flutter/material.dart';
 
+import 'model.dart';
+
 class DiscusiaConfig {
   static String errorMessage = "";
   static String currentTopic = "";
@@ -22,4 +24,6 @@ class DiscusiaConfig {
   static late Function setState;
   static final modelType = 2; // 0: OpenAI, 1: HF, 2: Groq
   static final TextEditingController responseController = TextEditingController();
+
+  static final List<DiscussionInteraction> interactions = [];
 }

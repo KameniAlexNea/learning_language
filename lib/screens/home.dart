@@ -1,4 +1,5 @@
 import 'package:discursia/db/discusia.dart';
+import 'package:discursia/widgets/history.dart';
 import 'package:flutter/material.dart';
 import '../api/llmservice.dart';
 import '../widgets/config.dart';
@@ -24,7 +25,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     super.initState();
 
     DiscusiaConfig.setState = setState;
-    DiscusiaConfig.tabController = TabController(length: 4, vsync: this);
+    DiscusiaConfig.tabController = TabController(length: 5, vsync: this);
     if (DiscusiaConfig.modelType == 0) {
       DiscusiaConfig.llmCall = askLLMOA;
     } else if (DiscusiaConfig.modelType == 1) {
@@ -54,6 +55,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
             Tab(icon: Icon(Icons.article), text: "Writing Task"),
             Tab(icon: Icon(Icons.lightbulb), text: "Suggested Answer"),
             Tab(icon: Icon(Icons.score), text: "Evaluation"),
+            Tab(icon: Icon(Icons.history), text: "History"),
           ],
         ),
       ),
@@ -70,7 +72,10 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
           SuggestScreen(),
 
           // Fourth Tab: Evaluation
-          EvalScreen()
+          EvalScreen(),
+
+          // 5th Tab: Saved History
+          HistoryPage(interactions: DiscusiaConfig.interactions)
         ],
       ),
     );

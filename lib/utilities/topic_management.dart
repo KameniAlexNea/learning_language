@@ -151,6 +151,10 @@ Future<void> saveData() async {
         evaluation: DiscusiaConfig.evaluation,
         suggestedIdea: DiscusiaConfig.suggestedIdea,
         suggestedAnswer: DiscusiaConfig.suggestedAnswer);
+
+    DiscusiaConfig.setState(() => {
+      DiscusiaConfig.interactions.add(data)
+    });
   } finally {
     DiscusiaConfig.setState(() => DiscusiaConfig.isSavingState = false);
   }
