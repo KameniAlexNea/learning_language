@@ -81,11 +81,19 @@ class _ExpandableCardState extends State<ExpandableCard> {
 }
 
 // If you still want a build function, you can create a helper function
-Widget buildCard(BuildContext context, String title, String content, {Color? backgroundColor, int previewLength = 200}) {
-  return ExpandableCard(
-    title: title,
-    content: content,
-    backgroundColor: backgroundColor,
-    previewLength: previewLength,
+Widget buildCard(BuildContext context, String title, String content, {Color? backgroundColor, double elevation = 1.0, int previewLength = 200}) {
+  return Card(
+    elevation: elevation,
+    color: backgroundColor,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: ExpandableCard(
+      title: title,
+      content: content,
+      // titleStyle: Theme.of(context).textTheme.titleLarge,
+      previewLength: previewLength,
+      // padding: const EdgeInsets.all(16),
+    ),
   );
 }

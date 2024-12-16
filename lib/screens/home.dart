@@ -1,6 +1,5 @@
 import 'package:discursia/db/discusia.dart';
 import 'package:flutter/material.dart';
-import '../widgets/builder.dart';
 import '../api/llmservice.dart';
 import 'config_screen.dart';
 import 'eval_screen.dart';

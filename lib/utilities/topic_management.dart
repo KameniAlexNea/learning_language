@@ -1,7 +1,28 @@
 import 'dart:io';
+import 'package:flutter/material.dart';
 
 import '../db/discusia.dart';
 import '../db/model.dart';
+
+
+  void showError(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  void showSuccess(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
+
 
 bool checkCurrentTopicNotEmpty() {
   if (DiscusiaConfig.currentTopic.isEmpty) {

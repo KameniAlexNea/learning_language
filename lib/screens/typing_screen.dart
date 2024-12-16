@@ -84,12 +84,16 @@ class _TypingScreenState extends State<TypingScreen> {
                 "Error: ${DiscusiaConfig.errorMessage}",
                 style: const TextStyle(color: Colors.red),
               ),
-            const SizedBox(height: 10),
-            buildCard(context, "Current Topic", DiscusiaConfig.currentTopic),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                    buildCard(context, "Current Topic", DiscusiaConfig.currentTopic),
             const SizedBox(height: 10),
             TextField(
               controller: DiscusiaConfig.responseController,
-              maxLines: 200, // Makes it expandable for long text
+              maxLines: 50, // Makes it expandable for long text
               keyboardType: TextInputType.multiline,
               decoration: InputDecoration(
                 border: OutlineInputBorder(
@@ -104,6 +108,8 @@ class _TypingScreenState extends State<TypingScreen> {
             ),
             const SizedBox(height: 10),
             buildCard(context, "Evaluation", DiscusiaConfig.evaluation),
+                  ]),
+            ),
           ],
         ),
       ),
