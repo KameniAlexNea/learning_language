@@ -2,6 +2,7 @@ import 'package:discursia/utilities/prompts.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../db/model.dart';
 import '../widgets/builder.dart';
 import '../api/llmservice.dart';
 import './themeselector.dart';
@@ -17,7 +18,16 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     with SingleTickerProviderStateMixin {
   final TextEditingController apiKeyController = TextEditingController();
   String selectedLanguage = "English"; // Default language
-  List<String> languages = ["English", "German", "French", "Italian", "Portuguese", "Hindi", "Spanish", "Thai"]; // supported lang of llama3.3
+  List<String> languages = [
+    "English",
+    "German",
+    "French",
+    "Italian",
+    "Portuguese",
+    "Hindi",
+    "Spanish",
+    "Thai"
+  ]; // supported lang of llama3.3
   String errorMessage = "";
   String currentTopic = "";
   String evaluation = "";
@@ -29,6 +39,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   bool isEvaluatingResponse = false;
   bool isGettingSuggestedAnswer = false;
   bool isGettingSuggestedIdea = false;
+  bool isSavingState = false;
 
   late Prompts prompts = Prompts("English");
   late TabController _tabController;
@@ -157,6 +168,27 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     }
   }
 
+  Future<void> saveData() async {
+    if (!checkCurrentTopicNotEmpty() ||
+        responseController.text.trim().isEmpty || currentTopic.isEmpty) {
+      return;
+    }
+    setState(() => isSavingState = true);
+    try {
+      // collect and save data
+      final String text = responseController.text.trim();
+      DiscussionInteraction data = DiscussionInteraction(
+        theme: currentTopic,
+        userAnswer: text,
+        evaluation: evaluation,
+        suggestedIdea: suggestedIdea,
+        suggestedAnswer: suggestedAnswer
+      );
+    } finally {
+      setState(() => isSavingState = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -254,6 +286,15 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
                                 : getSuggestedAnswer,
                           ),
                           const Text("Answer"),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          IconButton(
+                            icon: const Icon(LucideIcons.save),
+                            onPressed: isSavingState ? null : saveData,
+                          ),
+                          const Text("Save"),
                         ],
                       ),
                     ],
