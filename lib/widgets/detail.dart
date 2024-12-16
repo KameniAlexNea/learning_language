@@ -4,7 +4,7 @@ import '../db/model.dart';
 class DetailPage extends StatelessWidget {
   final DiscussionInteraction interaction;
 
-  DetailPage({required this.interaction});
+  const DetailPage({super.key, required this.interaction});
 
   @override
   Widget build(BuildContext context) {

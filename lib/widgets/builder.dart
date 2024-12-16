@@ -9,12 +9,12 @@ class ExpandableCard extends StatefulWidget {
   final int previewLength;
 
   const ExpandableCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.content,
     this.backgroundColor,
     this.previewLength = 200,
-  }) : super(key: key);
+  });
 
   @override
   _ExpandableCardState createState() => _ExpandableCardState();

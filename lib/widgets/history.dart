@@ -5,7 +5,7 @@ import './detail.dart';
 class HistoryPage extends StatelessWidget {
   final List<DiscussionInteraction> interactions;
 
-  HistoryPage({required this.interactions});
+  const HistoryPage({super.key, required this.interactions});
 
   @override
   Widget build(BuildContext context) {
