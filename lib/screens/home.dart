@@ -1,11 +1,10 @@
-import 'package:discursia/utilities/prompts.dart';
+import 'package:discursia/db/discusia.dart';
 import 'package:flutter/material.dart';
-import 'dart:io';
-import 'package:lucide_icons/lucide_icons.dart';
-import '../db/model.dart';
 import '../widgets/builder.dart';
 import '../api/llmservice.dart';
-import './themeselector.dart';
+import 'config_screen.dart';
+import 'eval_screen.dart';
+import 'typing_screen.dart';
 
 class WritingAssistantScreen extends StatefulWidget {
   const WritingAssistantScreen({super.key});
@@ -17,176 +16,30 @@ class WritingAssistantScreen extends StatefulWidget {
 class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     with SingleTickerProviderStateMixin {
   final TextEditingController apiKeyController = TextEditingController();
-  String selectedLanguage = "English"; // Default language
-  List<String> languages = [
-    "English",
-    "German",
-    "French",
-    "Italian",
-    "Portuguese",
-    "Hindi",
-    "Spanish",
-    "Thai"
-  ]; // supported lang of llama3.3
-  String errorMessage = "";
-  String currentTopic = "";
-  String evaluation = "";
-  String suggestedAnswer = "";
-  String suggestedIdea = "";
+
   TextEditingController responseController = TextEditingController();
-
-  bool isGeneratingTopic = false;
-  bool isEvaluatingResponse = false;
-  bool isGettingSuggestedAnswer = false;
-  bool isGettingSuggestedIdea = false;
-  bool isSavingState = false;
-
-  late Prompts prompts = Prompts("English");
-  late TabController _tabController;
-  late Function llmCall;
-  final modelType = 2; // 0: OpenAI, 1: HF, 2: Groq
 
   @override
   void initState() {
     super.initState();
 
-    _tabController = TabController(length: 3, vsync: this);
-    if (modelType == 0) {
-      llmCall = askLLMOA;
-    } else if (modelType == 1) {
-      llmCall = askLLMHF;
+    DiscusiaConfig.setState = setState;
+    DiscusiaConfig.tabController = TabController(length: 3, vsync: this);
+    if (DiscusiaConfig.modelType == 0) {
+      DiscusiaConfig.llmCall = askLLMOA;
+    } else if (DiscusiaConfig.modelType == 1) {
+      DiscusiaConfig.llmCall = askLLMHF;
     } else {
-      llmCall = askLLMGroq;
+      DiscusiaConfig.llmCall = askLLMGroq;
     }
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    DiscusiaConfig.tabController.dispose();
     apiKeyController.dispose();
     responseController.dispose();
     super.dispose();
-  }
-
-  bool checkCurrentTopicNotEmpty() {
-    if (currentTopic.isEmpty) {
-      setState(() {
-        errorMessage =
-            "Current topic cannot be empty. Please, first generate a topic";
-      });
-      return false;
-    }
-    return true;
-  }
-
-  Future<void> generateTopic() async {
-    try {
-      setState(() => isGeneratingTopic = true);
-      try {
-        final response = await llmCall(prompts.getGenerateTopicsMessages, 500);
-
-        setState(() {
-          currentTopic = response ?? "No topic generated.";
-          evaluation = "";
-          suggestedAnswer = "";
-          suggestedIdea = "";
-          errorMessage = "";
-        });
-      } on SocketException catch (e) {
-        setState(() {
-          errorMessage = "Network error: ${e.message}";
-        });
-      } catch (e) {
-        setState(() {
-          errorMessage = "An unexpected error occurred: $e";
-        });
-      }
-    } finally {
-      setState(() => isGeneratingTopic = false);
-    }
-  }
-
-  Future<void> evaluateResponse() async {
-    if (!checkCurrentTopicNotEmpty()) {
-      return;
-    }
-    setState(() => isEvaluatingResponse = true);
-    try {
-      final response = await llmCall(
-          prompts.getEvaluateResponseMessages(
-              currentTopic, responseController.text),
-          1000);
-
-      setState(() {
-        evaluation = response ?? "No evaluation generated.";
-        errorMessage = "";
-      });
-    } finally {
-      setState(() => isEvaluatingResponse = false);
-    }
-  }
-
-  Future<void> getSuggestedAnswer() async {
-    if (!checkCurrentTopicNotEmpty()) {
-      return;
-    }
-    setState(() => isGettingSuggestedAnswer = true);
-    try {
-      final response =
-          await llmCall(prompts.getSuggestedAnswerMessages(currentTopic), 1000);
-
-      setState(() {
-        suggestedAnswer = response ?? "No suggestion generated.";
-        errorMessage = "";
-        // Switch to the Suggested Answer tab
-        if (response != null) {
-          _tabController.animateTo(2);
-        }
-      });
-    } finally {
-      setState(() => isGettingSuggestedAnswer = false);
-    }
-  }
-
-  Future<void> getSuggestedIdea() async {
-    if (!checkCurrentTopicNotEmpty()) {
-      return;
-    }
-    setState(() => isGettingSuggestedIdea = true);
-    try {
-      final response =
-          await llmCall(prompts.getSuggestedIdeaMessages(currentTopic), 1000);
-
-      setState(() {
-        suggestedIdea = response ?? "No suggestion idea.";
-        errorMessage = "";
-        // Switch to the Suggested Answer tab
-        if (response != null) _tabController.animateTo(2);
-      });
-    } finally {
-      setState(() => isGettingSuggestedIdea = false);
-    }
-  }
-
-  Future<void> saveData() async {
-    if (!checkCurrentTopicNotEmpty() ||
-        responseController.text.trim().isEmpty || currentTopic.isEmpty) {
-      return;
-    }
-    setState(() => isSavingState = true);
-    try {
-      // collect and save data
-      final String text = responseController.text.trim();
-      DiscussionInteraction data = DiscussionInteraction(
-        theme: currentTopic,
-        userAnswer: text,
-        evaluation: evaluation,
-        suggestedIdea: suggestedIdea,
-        suggestedAnswer: suggestedAnswer
-      );
-    } finally {
-      setState(() => isSavingState = false);
-    }
   }
 
   @override
@@ -195,7 +48,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
       appBar: AppBar(
         title: const Text("Writing Assistant"),
         bottom: TabBar(
-          controller: _tabController,
+          controller: DiscusiaConfig.tabController,
           tabs: const [
             Tab(icon: Icon(Icons.settings), text: "App Setting"),
             Tab(icon: Icon(Icons.article), text: "Writing Task"),
@@ -204,146 +57,16 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
         ),
       ),
       body: TabBarView(
-        controller: _tabController,
+        controller: DiscusiaConfig.tabController,
         children: [
           // First Tab: API Key Configuration
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  DropdownButtonFormField<String>(
-                    value: selectedLanguage,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedLanguage = value!;
-                        prompts = Prompts(selectedLanguage);
-                      });
-                    },
-                    items: languages
-                        .map((lang) => DropdownMenuItem(
-                              value: lang,
-                              child: Text(lang),
-                            ))
-                        .toList(),
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: "Select language",
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  ThemeSelectorScreen()
-                ],
-              ),
-            ),
-          ),
+          ConfigScreen(),
 
           // Second Tab: Writing Assistant Functionality
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        children: [
-                          IconButton(
-                            icon: const Icon(LucideIcons.plus),
-                            onPressed: isGeneratingTopic ? null : generateTopic,
-                          ),
-                          const Text("Generate"),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          IconButton(
-                            icon: const Icon(LucideIcons.checkCircle),
-                            onPressed:
-                                isEvaluatingResponse ? null : evaluateResponse,
-                          ),
-                          const Text("Evaluate"),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          IconButton(
-                            icon: const Icon(LucideIcons.lightbulb),
-                            onPressed: isGettingSuggestedIdea
-                                ? null
-                                : getSuggestedIdea,
-                          ),
-                          const Text("Idea"),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          IconButton(
-                            icon: const Icon(LucideIcons.messageCircle),
-                            onPressed: isGettingSuggestedAnswer
-                                ? null
-                                : getSuggestedAnswer,
-                          ),
-                          const Text("Answer"),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          IconButton(
-                            icon: const Icon(LucideIcons.save),
-                            onPressed: isSavingState ? null : saveData,
-                          ),
-                          const Text("Save"),
-                        ],
-                      ),
-                    ],
-                  ),
-                  if (errorMessage.isNotEmpty)
-                    Text(
-                      "Error: $errorMessage",
-                      style: const TextStyle(color: Colors.red),
-                    ),
-                  const SizedBox(height: 10),
-                  buildCard(context, "Current Topic", currentTopic),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: responseController,
-                    maxLines: 200, // Makes it expandable for long text
-                    keyboardType: TextInputType.multiline,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      labelText: "Write your essay here",
-                      alignLabelWithHint: true, // Aligns label to top
-                    ),
-                    style: TextStyle(fontSize: 16.0),
-                    textAlignVertical: TextAlignVertical.top,
-                    minLines: 5, // Starts with 5 lines
-                  ),
-                  const SizedBox(height: 10),
-                  buildCard(context, "Evaluation", evaluation),
-                ],
-              ),
-            ),
-          ),
+          TypingScreen(),
 
           // Third Tab: Suggested Answer
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  buildCard(context, "Current Topic", currentTopic),
-                  const SizedBox(height: 10),
-                  buildCard(context, "Suggested Ideas", suggestedIdea),
-                  const SizedBox(height: 10),
-                  buildCard(context, "Suggested Answer", suggestedAnswer),
-                ],
-              ),
-            ),
-          ),
+          EvalScreen(),
         ],
       ),
     );
