@@ -76,6 +76,9 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
 
         setState(() {
           currentTopic = response ?? "No topic generated.";
+          evaluation = "";
+          suggestedAnswer = "";
+          suggestedIdea = "";
           errorMessage = "";
         });
       } on SocketException catch (e) {
