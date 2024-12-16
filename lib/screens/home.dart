@@ -1,10 +1,10 @@
 import 'package:discursia/db/discusia.dart';
 import 'package:flutter/material.dart';
 import '../api/llmservice.dart';
-import '../widgets/config_screen.dart';
-import '../widgets/eval_screen.dart';
-import '../widgets/suggest_screen.dart';
-import '../widgets/typing_screen.dart';
+import '../widgets/config.dart';
+import '../widgets/eval.dart';
+import '../widgets/suggest.dart';
+import '../widgets/writing.dart';
 
 class WritingAssistantScreen extends StatefulWidget {
   const WritingAssistantScreen({super.key});
@@ -46,7 +46,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Writing Assistant"),
+        title: const Text("Discursia"),
         bottom: TabBar(
           controller: DiscusiaConfig.tabController,
           tabs: const [

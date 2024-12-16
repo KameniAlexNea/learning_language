@@ -39,7 +39,8 @@ class _TypingScreenState extends State<TypingScreen> {
                   children: [
                     IconButton(
                       icon: const Icon(LucideIcons.checkCircle),
-                      onPressed: DiscusiaConfig.isEvaluatingResponse
+                      onPressed: DiscusiaConfig.isEvaluatingResponse ||
+                              DiscusiaConfig.currentTopic.isEmpty
                           ? null
                           : evaluateResponse,
                     ),
@@ -50,7 +51,8 @@ class _TypingScreenState extends State<TypingScreen> {
                   children: [
                     IconButton(
                       icon: const Icon(LucideIcons.lightbulb),
-                      onPressed: DiscusiaConfig.isGettingSuggestedIdea
+                      onPressed: DiscusiaConfig.isGettingSuggestedIdea ||
+                              DiscusiaConfig.currentTopic.isEmpty
                           ? null
                           : getSuggestedIdea,
                     ),
@@ -61,7 +63,8 @@ class _TypingScreenState extends State<TypingScreen> {
                   children: [
                     IconButton(
                       icon: const Icon(LucideIcons.messageCircle),
-                      onPressed: DiscusiaConfig.isGettingSuggestedAnswer
+                      onPressed: DiscusiaConfig.isGettingSuggestedAnswer ||
+                              DiscusiaConfig.currentTopic.isEmpty
                           ? null
                           : getSuggestedAnswer,
                     ),
@@ -72,7 +75,11 @@ class _TypingScreenState extends State<TypingScreen> {
                   children: [
                     IconButton(
                       icon: const Icon(LucideIcons.save),
-                      onPressed: DiscusiaConfig.isSavingState ? null : saveData,
+                      onPressed: DiscusiaConfig.isSavingState ||
+                              DiscusiaConfig.currentTopic.isEmpty||
+                              DiscusiaConfig.evaluation.isEmpty
+                          ? null
+                          : saveData,
                     ),
                     const Text("Save"),
                   ],
@@ -88,26 +95,28 @@ class _TypingScreenState extends State<TypingScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
               child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                    buildCard(context, "Current Topic", DiscusiaConfig.currentTopic),
-            const SizedBox(height: 10),
-            TextField(
-              controller: DiscusiaConfig.responseController,
-              maxLines: 50, // Makes it expandable for long text
-              keyboardType: TextInputType.multiline,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                labelText: "Write your essay here",
-                alignLabelWithHint: true, // Aligns label to top
-              ),
-              style: TextStyle(fontSize: 16.0),
-              textAlignVertical: TextAlignVertical.top,
-              minLines: 5, // Starts with 5 lines
-            ),
-            // const SizedBox(height: 10),
-            // buildCard(context, "Evaluation", DiscusiaConfig.evaluation),
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    buildCard(
+                        context, "Current Topic", DiscusiaConfig.currentTopic),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: DiscusiaConfig.responseController,
+                      maxLines: 50, // Makes it expandable for long text
+                      keyboardType: TextInputType.multiline,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        labelText: "Write your essay here",
+                        alignLabelWithHint: true, // Aligns label to top
+                      ),
+                      style: TextStyle(fontSize: 16.0),
+                      textAlignVertical: TextAlignVertical.top,
+                      minLines: 5, // Starts with 5 lines
+                    ),
+                    // const SizedBox(height: 10),
+                    // buildCard(context, "Evaluation", DiscusiaConfig.evaluation),
                   ]),
             ),
           ],

@@ -12,14 +12,7 @@ class ThemeSelectorScreen extends StatefulWidget {
 
 class _ThemeSelectorScreenState extends State<ThemeSelectorScreen>
     with SingleTickerProviderStateMixin {
-  final List<String> themes = [
-    'Informatic',
-    'Science',
-    'Biology',
-    'Sport',
-    'Life',
-    'Balance',
-  ];
+  final List<String> themes = [];
 
   final Set<String> selectedThemes = {};
   final TextEditingController themeController = TextEditingController();
