@@ -9,12 +9,12 @@ class ExpandableCard extends StatefulWidget {
   final int previewLength;
 
   const ExpandableCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.content,
     this.backgroundColor,
     this.previewLength = 200,
-  }) : super(key: key);
+  });
 
   @override
   _ExpandableCardState createState() => _ExpandableCardState();
@@ -37,7 +37,7 @@ class _ExpandableCardState extends State<ExpandableCard> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
                 widget.title,
@@ -81,11 +81,19 @@ class _ExpandableCardState extends State<ExpandableCard> {
 }
 
 // If you still want a build function, you can create a helper function
-Widget buildCard(BuildContext context, String title, String content, {Color? backgroundColor, int previewLength = 200}) {
-  return ExpandableCard(
-    title: title,
-    content: content,
-    backgroundColor: backgroundColor,
-    previewLength: previewLength,
+Widget buildCard(BuildContext context, String title, String content, {Color? backgroundColor, double elevation = 1.0, int previewLength = 200}) {
+  return Card(
+    elevation: elevation,
+    color: backgroundColor,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: ExpandableCard(
+      title: title,
+      content: content,
+      // titleStyle: Theme.of(context).textTheme.titleLarge,
+      previewLength: previewLength,
+      // padding: const EdgeInsets.all(16),
+    ),
   );
 }

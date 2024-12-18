@@ -13,4 +13,4 @@ final String gropModel = dotenv.env['gropModel'] ?? '';
 final String hfModelName = dotenv.env['hfModelName'] ?? '';
 
 String get hfLink =>
-    "https://api-inference.huggingface.co/models/${hfModelName}/v1/chat/completions";
+    "https://api-inference.huggingface.co/models/$hfModelName/v1/chat/completions";
