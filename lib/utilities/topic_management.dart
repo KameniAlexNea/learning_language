@@ -44,11 +44,9 @@ Future<void> generateTopic() async {
 
       DiscusiaConfig.setState(() {
         DiscusiaConfig.currentTopic = response ?? "No topic generated.";
-        DiscusiaConfig.evaluation = "";
-        DiscusiaConfig.suggestedAnswer = "";
-        DiscusiaConfig.suggestedIdea = "";
-        DiscusiaConfig.errorMessage = "";
+        
       });
+      DiscusiaConfig.clearInterface();
     } on SocketException catch (e) {
       DiscusiaConfig.setState(() {
         DiscusiaConfig.errorMessage = "Network error: ${e.message}";

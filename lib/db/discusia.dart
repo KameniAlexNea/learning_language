@@ -1,6 +1,8 @@
 import '../utilities/prompts.dart';
 import 'package:flutter/material.dart';
 
+import '../api/llmservice.dart';
+
 import 'model.dart';
 
 class DiscusiaConfig {
@@ -17,13 +19,35 @@ class DiscusiaConfig {
   static bool isSavingState = false;
 
   static String selectedLanguage = "English";
-  static Prompts prompts = Prompts("English");
+  static Prompts get prompts => Prompts(selectedLanguage);
 
   static late TabController tabController;
-  static late Function llmCall;
+  static Function get llmCall =>
+      modelType == 0 ? askLLMOA : (modelType == 1 ? askLLMHF : askLLMGroq);
   static late Function setState;
   static final modelType = 2; // 0: OpenAI, 1: HF, 2: Groq
-  static final TextEditingController responseController = TextEditingController();
+  static final TextEditingController responseController =
+      TextEditingController();
 
   static final List<DiscussionInteraction> interactions = [];
+
+  static void clearInterface({bool withTopic = false}) {
+    setState(() {
+      errorMessage = "";
+      evaluation = "";
+      suggestedAnswer = "";
+      suggestedIdea = "";
+
+      isEvaluatingResponse = false;
+      isGettingSuggestedAnswer = false;
+      isGettingSuggestedIdea = false;
+      isSavingState = false;
+
+      responseController.text = "";
+      if (withTopic) {
+        currentTopic = "";
+        isGeneratingTopic = false;
+      }
+    });
+  }
 }

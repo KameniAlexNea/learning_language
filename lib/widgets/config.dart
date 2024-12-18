@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../db/discusia.dart';
-import '../utilities/prompts.dart';
 import 'themeselector.dart';
 
 class ConfigScreen extends StatefulWidget {
@@ -36,8 +35,6 @@ class _ConfigScreenState extends State<ConfigScreen> {
               onChanged: (value) {
                 setState(() {
                   DiscusiaConfig.selectedLanguage = value!;
-                  DiscusiaConfig.prompts =
-                      Prompts(DiscusiaConfig.selectedLanguage);
                 });
               },
               items: languages

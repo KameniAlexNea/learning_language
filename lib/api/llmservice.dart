@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../utilities/api_key.dart';
 
@@ -9,6 +10,9 @@ Future<String?> askLLM(
   List<Map<String, dynamic>> messages,
   int maxTokens,
 ) async {
+  if (kDebugMode) {
+    return "Okay Great \n Messages: $messages \n Model: $modelName";
+  }
   final response = await http
       .post(
         Uri.parse(url),

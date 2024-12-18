@@ -1,7 +1,6 @@
 import 'package:discursia/db/discusia.dart';
 import 'package:discursia/widgets/history.dart';
 import 'package:flutter/material.dart';
-import '../api/llmservice.dart';
 import '../widgets/config.dart';
 import '../widgets/eval.dart';
 import '../widgets/suggest.dart';
@@ -26,13 +25,6 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
 
     DiscusiaConfig.setState = setState;
     DiscusiaConfig.tabController = TabController(length: 5, vsync: this);
-    if (DiscusiaConfig.modelType == 0) {
-      DiscusiaConfig.llmCall = askLLMOA;
-    } else if (DiscusiaConfig.modelType == 1) {
-      DiscusiaConfig.llmCall = askLLMHF;
-    } else {
-      DiscusiaConfig.llmCall = askLLMGroq;
-    }
   }
 
   @override

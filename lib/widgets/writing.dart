@@ -114,6 +114,7 @@ class _TypingScreenState extends State<TypingScreen> {
                       style: TextStyle(fontSize: 16.0),
                       textAlignVertical: TextAlignVertical.top,
                       minLines: 5, // Starts with 5 lines
+                      textCapitalization: TextCapitalization.sentences
                     ),
                     // const SizedBox(height: 10),
                     // buildCard(context, "Evaluation", DiscusiaConfig.evaluation),

@@ -15,8 +15,8 @@ class DetailPage extends StatelessWidget {
       DiscusiaConfig.suggestedIdea = interaction.suggestedIdea;
       DiscusiaConfig.suggestedAnswer = interaction.suggestedAnswer;
       DiscusiaConfig.responseController.text = interaction.userAnswer;
-      DiscusiaConfig.tabController.animateTo(1);
     });
+    DiscusiaConfig.tabController.animateTo(1);
   }
 
   @override
