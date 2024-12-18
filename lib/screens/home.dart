@@ -6,6 +6,18 @@ import '../widgets/eval.dart';
 import '../widgets/suggest.dart';
 import '../widgets/writing.dart';
 
+
+class WritingAssistantApp extends StatelessWidget {
+  const WritingAssistantApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: WritingAssistantScreen(),
+    );
+  }
+}
+
 class WritingAssistantScreen extends StatefulWidget {
   const WritingAssistantScreen({super.key});
 

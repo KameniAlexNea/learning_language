@@ -42,6 +42,9 @@ dependencies:
   shared_preferences: ^2.3.3
   lucide_icons: ^0.257.0
   firebase_core: ^3.8.1
+  firebase_auth: ^5.3.4
+  google_fonts: ^6.2.1
+  cloud_firestore: ^5.5.1
 
 dev_dependencies:
   flutter_test:
