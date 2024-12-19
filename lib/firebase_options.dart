@@ -85,4 +85,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'discursia-b2e55.firebasestorage.app',
     measurementId: 'G-97HYXG718N',
   );
+
 }

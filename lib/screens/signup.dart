@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:password_field_validator/password_field_validator.dart';
 
 import 'login.dart';
+import '../utilities/auth_google.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -18,8 +21,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
   bool _isLoading = false;
 
   Future<bool> _checkUsernameAvailability(String username) async {
@@ -97,6 +99,59 @@ class _SignUpPageState extends State<SignUpPage> {
     }
   }
 
+  Future<void> _signUpWithGoogle() async {
+    setState(() => _isLoading = true);
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) {
+        setState(() => _isLoading = false);
+        return; // User canceled the sign-in
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+
+      final user = userCredential.user;
+      if (user != null) {
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+
+        if (!userDoc.exists) {
+          await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+            'username': user.displayName ?? '',
+            'email': user.email ?? '',
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+        }
+
+        if (mounted) {
+          setState(() => _isLoading = false);
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => LoginPage()),
+          );
+        }
+      }
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Google sign-up failed: ${e.message}')),
+        );
+      }
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
   String _getErrorMessage(String code) {
     switch (code) {
       case 'weak-password':
@@ -104,6 +159,9 @@ class _SignUpPageState extends State<SignUpPage> {
       case 'email-already-in-use':
         return 'An account already exists with this email.';
       default:
+        if (kDebugMode) {
+          print(code);
+        }
         return 'Sign up failed';
     }
   }
@@ -203,9 +261,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       return 'Please enter your email';
                     }
                     // More robust email validation
-                    final emailRegex =
-                        RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                    if (!emailRegex.hasMatch(value)) {
+                    if (!validateEmail(value)) {
                       return 'Please enter a valid email address';
                     }
                     return null;
@@ -220,21 +276,35 @@ class _SignUpPageState extends State<SignUpPage> {
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.lock),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a password';
-                    }
-                    if (value.length < 8) {
-                      return 'Password must be at least 8 characters';
-                    }
-                    // Optional: Add more complex password validation
-                    if (!RegExp(
-                            r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$')
-                        .hasMatch(value)) {
-                      return 'Password must include uppercase, lowercase, number, and special character';
-                    }
-                    return null;
-                  },
+                  // validator: (value) {
+                  //   if (value == null || value.isEmpty) {
+                  //     return 'Please enter a password';
+                  //   }
+                  //   if (value.length < 8) {
+                  //     return 'Password must be at least 8 characters';
+                  //   }
+                  //   // Optional: Add more complex password validation
+                  //   if (!RegExp(
+                  //           r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}\\$')
+                  //       .hasMatch(value)) {
+                  //     return 'Password must include uppercase, lowercase, number, and special character';
+                  //   }
+                  //   return null;
+                  // },
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: PasswordFieldValidator(
+                    minLength: 8,
+                    uppercaseCharCount: 1,
+                    lowercaseCharCount: 2,
+                    numericCharCount: 2,
+                    specialCharCount: 1,
+                    defaultColor: Colors.black,
+                    successColor: Colors.green,
+                    failureColor: Colors.red,
+                    controller: _passwordController,
+                  ),
                 ),
                 SizedBox(height: 20),
                 TextFormField(
@@ -249,25 +319,38 @@ class _SignUpPageState extends State<SignUpPage> {
                     if (value == null || value.isEmpty) {
                       return 'Please confirm your password';
                     }
+                    if (value != _passwordController.text) {
+                      return 'Passwords do not match';
+                    }
                     return null;
                   },
                 ),
                 SizedBox(height: 30),
-                _isLoading
-                    ? CircularProgressIndicator()
-                    : ElevatedButton(
+                if (_isLoading)
+                  CircularProgressIndicator()
+                else
+                  Column(
+                    children: [
+                      ElevatedButton(
                         onPressed: _signUp,
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: Size(double.infinity, 50),
-                        ),
                         child: Text('Sign Up'),
                       ),
+                      SizedBox(height: 10),
+                      OutlinedButton.icon(
+                        onPressed: _signUpWithGoogle,
+                        icon: Icon(Icons.login),
+                        label: Text('Sign Up with Google'),
+                      ),
+                    ],
+                  ),
                 SizedBox(height: 20),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (_) => LoginPage()),
+                    );
                   },
-                  child: Text('Already have an account? Login'),
+                  child: Text('Already have an account? Log in'),
                 ),
               ],
             ),

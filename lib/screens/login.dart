@@ -1,8 +1,15 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:email_validator/email_validator.dart';
+import 'package:password_field_validator/password_field_validator.dart';
 import 'signup.dart';
+
+bool validateEmail(String email) {
+  return EmailValidator.validate(email);
+}
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -45,6 +52,11 @@ class _LoginPageState extends State<LoginPage> {
           case 'user-disabled':
             errorMessage = 'This user account has been disabled.';
             break;
+          default:
+            errorMessage = 'Login failed';
+            if (kDebugMode) {
+              print(e.code);
+            }
         }
 
         if (mounted) {
@@ -59,7 +71,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _showEmailVerificationDialog(User user) async {
-    if (!mounted) return; // Prevent showing the dialog if the widget is unmounted
+    if (!mounted) {
+      return; // Prevent showing the dialog if the widget is unmounted
+    }
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -99,6 +113,37 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Future<void> _signInWithGoogle() async {
+    setState(() => _isLoading = true);
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) {
+        setState(() => _isLoading = false);
+        return; // User canceled the sign-in
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      setState(() {
+        // reset state to navigate to the main page
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Google Sign-In failed: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -130,9 +175,7 @@ class _LoginPageState extends State<LoginPage> {
                       return 'Please enter your email';
                     }
                     // Basic email validation
-                    final emailRegex =
-                        RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                    if (!emailRegex.hasMatch(value)) {
+                    if (!validateEmail(value)) {
                       return 'Please enter a valid email address';
                     }
                     return null;
@@ -147,12 +190,26 @@ class _LoginPageState extends State<LoginPage> {
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.lock),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    return null;
-                  },
+                  // validator: (value) {
+                  //   if (value == null || value.isEmpty) {
+                  //     return 'Please enter your password';
+                  //   }
+                  //   return null;
+                  // },
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: PasswordFieldValidator(
+                    minLength: 8,
+                    uppercaseCharCount: 1,
+                    lowercaseCharCount: 2,
+                    numericCharCount: 2,
+                    specialCharCount: 1,
+                    defaultColor: Colors.black,
+                    successColor: Colors.green,
+                    failureColor: Colors.red,
+                    controller: _passwordController,
+                  ),
                 ),
                 SizedBox(height: 30),
                 _isLoading
@@ -164,6 +221,15 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         child: Text('Login'),
                       ),
+                SizedBox(height: 20),
+                ElevatedButton.icon(
+                  onPressed: _signInWithGoogle,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 50),
+                  ),
+                  icon: Icon(Icons.g_mobiledata),
+                  label: Text('Sign in with Google'),
+                ),
                 SizedBox(height: 20),
                 TextButton(
                   onPressed: () {

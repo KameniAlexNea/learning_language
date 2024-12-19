@@ -5,11 +5,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'firebase_options.dart';
+import 'utilities/storage_manager.dart';
 
 import 'screens/login.dart';
-import 'utilities/storage_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Required for async calls in main
