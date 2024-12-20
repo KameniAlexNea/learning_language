@@ -1,7 +1,7 @@
 import 'package:discursia/db/discusia.dart';
 import 'package:flutter/material.dart';
 import '../db/model.dart';
-import 'builder.dart';
+import 'card_builder.dart';
 
 class DetailPage extends StatelessWidget {
   final DiscussionInteraction interaction;

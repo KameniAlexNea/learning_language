@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../db/discusia.dart';
-import 'builder.dart';
+import 'card_builder.dart';
 import '../utilities/topic_management.dart';
 
 class TypingScreen extends StatefulWidget {

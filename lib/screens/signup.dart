@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:password_field_validator/password_field_validator.dart';
-
+import 'package:email_validator/email_validator.dart';
 import '../db/database.dart';
-import 'home.dart';
 import 'login.dart';
 import '../utilities/auth_google.dart';
 
@@ -72,7 +71,7 @@ class _SignUpPageState extends State<SignUpPage> {
         // Navigate to the main application after successful sign-up
         if (mounted) {
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => WritingAssistantApp()),
+            MaterialPageRoute(builder: (context) => LoginPage()),
           );
         }
       } on FirebaseAuthException catch (e) {
@@ -203,6 +202,19 @@ class _SignUpPageState extends State<SignUpPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                SizedBox(height: 10),
+                Text(
+                  'Discover, discuss, and improve your language skills with Discursia – '
+                  'where every conversation takes you closer to fluency!',
+                  style: GoogleFonts.roboto(
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                    color: Colors.black, // Add color for better customization
+                    height: 1.5, // Add line height for better readability
+                  ),
+                  textAlign: TextAlign
+                      .center, // Center-align the text for a cleaner look
+                ),
                 SizedBox(height: 30),
                 TextFormField(
                   controller: _usernameController,
@@ -234,7 +246,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       return 'Please enter your email';
                     }
                     // More robust email validation
-                    if (!validateEmail(value)) {
+                    if (!EmailValidator.validate(value)) {
                       return 'Please enter a valid email address';
                     }
                     return null;
@@ -242,29 +254,19 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 SizedBox(height: 20),
                 TextFormField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.lock),
-                  ),
-                  // validator: (value) {
-                  //   if (value == null || value.isEmpty) {
-                  //     return 'Please enter a password';
-                  //   }
-                  //   if (value.length < 8) {
-                  //     return 'Password must be at least 8 characters';
-                  //   }
-                  //   // Optional: Add more complex password validation
-                  //   if (!RegExp(
-                  //           r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}\\$')
-                  //       .hasMatch(value)) {
-                  //     return 'Password must include uppercase, lowercase, number, and special character';
-                  //   }
-                  //   return null;
-                  // },
-                ),
+                    controller: _passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.lock),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a password';
+                      }
+                      return null;
+                    }),
                 Padding(
                   padding: const EdgeInsets.all(15),
                   child: PasswordFieldValidator(

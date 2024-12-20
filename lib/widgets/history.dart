@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../db/model.dart';
 import './detail.dart';
-import 'builder.dart';
+import 'card_builder.dart';
 
 class HistoryPage extends StatelessWidget {
   final List<DiscussionInteraction> interactions;

@@ -4,25 +4,23 @@ import 'package:flutter/material.dart';
 import '../db/discusia.dart';
 import '../db/model.dart';
 
+void showError(BuildContext context, String message) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.red,
+    ),
+  );
+}
 
-  void showError(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-
-  void showSuccess(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-      ),
-    );
-  }
-
+void showSuccess(BuildContext context, String message) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.green,
+    ),
+  );
+}
 
 bool checkCurrentTopicNotEmpty() {
   if (DiscusiaConfig.currentTopic.isEmpty) {
@@ -44,7 +42,6 @@ Future<void> generateTopic() async {
 
       DiscusiaConfig.setState(() {
         DiscusiaConfig.currentTopic = response ?? "No topic generated.";
-        
       });
       DiscusiaConfig.clearInterface();
     } on SocketException catch (e) {

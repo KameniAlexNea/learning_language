@@ -7,10 +7,6 @@ import '../utilities/auth_google.dart';
 import 'home.dart';
 import 'signup.dart';
 
-bool validateEmail(String email) {
-  return EmailValidator.validate(email);
-}
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -162,6 +158,19 @@ class _LoginPageState extends State<LoginPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                SizedBox(height: 10),
+                Text(
+                  'Discover, discuss, and improve your language skills with Discursia – '
+                  'where every conversation takes you closer to fluency!',
+                  style: GoogleFonts.roboto(
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                    color: Colors.black, // Add color for better customization
+                    height: 1.5, // Add line height for better readability
+                  ),
+                  textAlign: TextAlign
+                      .center, // Center-align the text for a cleaner look
+                ),
                 SizedBox(height: 30),
                 TextFormField(
                   controller: _emailController,
@@ -175,7 +184,7 @@ class _LoginPageState extends State<LoginPage> {
                       return 'Please enter your email';
                     }
                     // Basic email validation
-                    if (!validateEmail(value)) {
+                    if (!EmailValidator.validate(value)) {
                       return 'Please enter a valid email address';
                     }
                     return null;
@@ -217,7 +226,7 @@ class _LoginPageState extends State<LoginPage> {
                   label: Text('Sign in with Google'),
                 ),
                 SizedBox(height: 20),
-                TextButton(
+                ElevatedButton(
                   onPressed: () {
                     if (mounted) {
                       Navigator.of(context).push(
@@ -225,6 +234,9 @@ class _LoginPageState extends State<LoginPage> {
                       );
                     }
                   },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 50),
+                  ),
                   child: Text('Create an Account'),
                 ),
               ],
