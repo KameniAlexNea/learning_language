@@ -2,9 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:password_field_validator/password_field_validator.dart';
+import '../utilities/auth_google.dart';
 import 'signup.dart';
 
 bool validateEmail(String email) {
@@ -39,6 +38,8 @@ class _LoginPageState extends State<LoginPage> {
           if (mounted) {
             await _showEmailVerificationDialog(userCredential.user!);
           }
+        } else {
+          GoogleAuthService.user = userCredential.user;
         }
       } on FirebaseAuthException catch (e) {
         String errorMessage = 'Login failed';
@@ -116,22 +117,9 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _signInWithGoogle() async {
     setState(() => _isLoading = true);
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) {
-        setState(() => _isLoading = false);
-        return; // User canceled the sign-in
-      }
-
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      await FirebaseAuth.instance.signInWithCredential(credential);
+      GoogleAuthService.signIn();
       setState(() {
-        // reset state to navigate to the main page
+        _isLoading = false;
       });
     } catch (e) {
       if (mounted) {
@@ -190,26 +178,12 @@ class _LoginPageState extends State<LoginPage> {
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.lock),
                   ),
-                  // validator: (value) {
-                  //   if (value == null || value.isEmpty) {
-                  //     return 'Please enter your password';
-                  //   }
-                  //   return null;
-                  // },
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(15),
-                  child: PasswordFieldValidator(
-                    minLength: 8,
-                    uppercaseCharCount: 1,
-                    lowercaseCharCount: 2,
-                    numericCharCount: 2,
-                    specialCharCount: 1,
-                    defaultColor: Colors.black,
-                    successColor: Colors.green,
-                    failureColor: Colors.red,
-                    controller: _passwordController,
-                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    return null;
+                  },
                 ),
                 SizedBox(height: 30),
                 _isLoading

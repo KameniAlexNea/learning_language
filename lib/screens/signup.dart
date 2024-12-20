@@ -2,10 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:password_field_validator/password_field_validator.dart';
 
+import '../db/database.dart';
 import 'login.dart';
 import '../utilities/auth_google.dart';
 
@@ -21,25 +20,9 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   bool _isLoading = false;
-
-  Future<bool> _checkUsernameAvailability(String username) async {
-    try {
-      // Check Firestore for existing username
-      final querySnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .where('username', isEqualTo: username)
-          .get();
-
-      return querySnapshot.docs.isEmpty;
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error checking username: $e');
-      }
-      return false;
-    }
-  }
 
   Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
@@ -52,9 +35,12 @@ class _SignUpPageState extends State<SignUpPage> {
         return;
       }
 
+      setState(() => _isLoading = true);
+
       bool isUsernameAvailable =
-          await _checkUsernameAvailability(_usernameController.text.trim());
+          await checkUsernameAvailability(_usernameController.text.trim());
       if (!isUsernameAvailable) {
+        setState(() => _isLoading = false);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Username is already taken')),
@@ -71,16 +57,13 @@ class _SignUpPageState extends State<SignUpPage> {
           password: _passwordController.text.trim(),
         );
 
-        await userCredential.user?.sendEmailVerification();
+        await createUser(userCredential.user!.uid,
+            _usernameController.text.trim(), _emailController.text.trim());
 
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userCredential.user!.uid)
-            .set({
-          'username': _usernameController.text.trim(),
-          'email': _emailController.text.trim(),
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+        await userCredential.user!
+            .updateProfile(displayName: _usernameController.text.trim());
+
+        await userCredential.user?.sendEmailVerification();
 
         if (mounted) {
           await _showEmailVerificationDialog(userCredential.user!);
@@ -102,36 +85,19 @@ class _SignUpPageState extends State<SignUpPage> {
   Future<void> _signUpWithGoogle() async {
     setState(() => _isLoading = true);
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) {
-        setState(() => _isLoading = false);
-        return; // User canceled the sign-in
+      UserCredential? userCredential = await GoogleAuthService.signIn();
+      if (userCredential == null) {
+        setState(() {
+          _isLoading = true;
+        });
       }
 
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithCredential(credential);
-
-      final user = userCredential.user;
+      final user = userCredential!.user;
       if (user != null) {
-        final userDoc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get();
+        final userDoc = await getUser(user.uid);
 
         if (!userDoc.exists) {
-          await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-            'username': user.displayName ?? '',
-            'email': user.email ?? '',
-            'createdAt': FieldValue.serverTimestamp(),
-          });
+          await createUser(user.uid, user.displayName ?? '', user.email ?? '');
         }
 
         if (mounted) {

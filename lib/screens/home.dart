@@ -1,11 +1,11 @@
 import 'package:discursia/db/discusia.dart';
 import 'package:discursia/widgets/history.dart';
 import 'package:flutter/material.dart';
+import '../utilities/auth_google.dart';
 import '../widgets/config.dart';
 import '../widgets/eval.dart';
 import '../widgets/suggest.dart';
 import '../widgets/writing.dart';
-
 
 class WritingAssistantApp extends StatelessWidget {
   const WritingAssistantApp({super.key});
@@ -49,9 +49,10 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
 
   @override
   Widget build(BuildContext context) {
+    final String name = GoogleAuthService.user!.displayName ?? '';
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Discursia"),
+        title: Text("Discursia, $name"),
         bottom: TabBar(
           controller: DiscusiaConfig.tabController,
           tabs: const [

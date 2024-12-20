@@ -5,7 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 class GoogleAuthService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final GoogleSignIn _googleSignIn = GoogleSignIn();
-  static late User user;
+  static late User? user;
 
   static Future<UserCredential?> signIn() async {
     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
@@ -20,8 +20,10 @@ class GoogleAuthService {
 
     UserCredential userCredential =
           await FirebaseAuth.instance.signInWithCredential(credential);
+    user = userCredential.user;
     return userCredential;
   }
+
 
   static Future<void> signOut() async {
     try {
