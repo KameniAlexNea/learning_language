@@ -308,23 +308,34 @@ class _SignUpPageState extends State<SignUpPage> {
                     children: [
                       ElevatedButton(
                         onPressed: _signUp,
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: Size(double.infinity, 50),
+                        ),
                         child: Text('Sign Up'),
                       ),
                       SizedBox(height: 10),
                       OutlinedButton.icon(
                         onPressed: _signUpWithGoogle,
                         icon: Icon(Icons.login),
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: Size(double.infinity, 50),
+                        ),
                         label: Text('Sign Up with Google'),
                       ),
                     ],
                   ),
                 SizedBox(height: 20),
-                TextButton(
+                ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (_) => LoginPage()),
-                    );
+                    if (mounted) {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (_) => LoginPage()),
+                      );
+                    }
                   },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(double.infinity, 50),
+                  ),
                   child: Text('Already have an account? Log in'),
                 ),
               ],
