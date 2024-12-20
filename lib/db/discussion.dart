@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../utilities/auth_google.dart';
 import 'model.dart';
 
-class DiscussionInteractionService {
+class DiscussionInteractionDBManager {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String? userId = GoogleAuthService.user?.uid;
   final String collectionName = 'discussion_interactions';
@@ -35,7 +35,7 @@ class DiscussionInteractionService {
   }
 
   // Get a single discussion interaction by ID
-  Future<DiscussionInteraction?> getDiscussionInteraction(
+  Future<DiscussionUserInteraction?> getDiscussionInteraction(
       String documentId) async {
     try {
       final DocumentSnapshot doc =
@@ -46,14 +46,14 @@ class DiscussionInteractionService {
       }
 
       final data = doc.data() as Map<String, dynamic>;
-      return DiscussionInteraction.fromJson(data);
+      return DiscussionUserInteraction.fromJson(data);
     } catch (e) {
       throw Exception('Failed to get discussion interaction: $e');
     }
   }
 
   // Get all discussion interactions for the current user
-  Stream<List<DiscussionInteraction>> getUserDiscussionInteractions() {
+  Stream<List<DiscussionUserInteraction>> getUserDiscussionInteractions() {
     if (userId == null) {
       throw Exception('User must be logged in to get interactions');
     }
@@ -64,7 +64,7 @@ class DiscussionInteractionService {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) => snapshot.docs
-            .map((doc) => DiscussionInteraction.fromJson(doc.data()))
+            .map((doc) => DiscussionUserInteraction.fromJson(doc.data()))
             .toList());
   }
 

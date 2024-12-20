@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../db/discusia.dart';
 import '../db/model.dart';
+import 'auth_google.dart';
 
 void showError(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(
@@ -140,7 +141,8 @@ Future<void> saveData() async {
   try {
     // collect and save data
     final String text = DiscusiaConfig.responseController.text.trim();
-    DiscussionInteraction data = DiscussionInteraction(
+    DiscussionUserInteraction data = DiscussionUserInteraction(
+        userId: GoogleAuthService.user!.uid,
         theme: DiscusiaConfig.currentTopic,
         userAnswer: text,
         evaluation: DiscusiaConfig.evaluation,
