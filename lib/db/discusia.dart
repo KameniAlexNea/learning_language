@@ -2,7 +2,6 @@ import '../utilities/prompts.dart';
 import 'package:flutter/material.dart';
 
 import '../api/llmservice.dart';
-
 import 'model.dart';
 
 class DiscusiaConfig {
@@ -29,7 +28,7 @@ class DiscusiaConfig {
   static final TextEditingController responseController =
       TextEditingController();
 
-  static final List<DiscussionUserInteraction> interactions = [];
+  static List<DiscussionUserInteraction> interactions = [];
 
   static void clearInterface({bool withTopic = false}) {
     setState(() {

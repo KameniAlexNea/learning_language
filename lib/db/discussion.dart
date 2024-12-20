@@ -4,12 +4,12 @@ import '../utilities/auth_google.dart';
 import 'model.dart';
 
 class DiscussionInteractionDBManager {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final String? userId = GoogleAuthService.user?.uid;
-  final String collectionName = 'discussion_interactions';
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final String? userId = GoogleAuthService.user?.uid;
+  static final String collectionName = 'discussion_interactions';
 
   // Create a new discussion interaction
-  Future<String> createDiscussionInteraction(
+  static Future<String> createDiscussionInteraction(
       DiscussionInteraction interaction) async {
     try {
       if (userId == null) {
@@ -35,7 +35,7 @@ class DiscussionInteractionDBManager {
   }
 
   // Get a single discussion interaction by ID
-  Future<DiscussionUserInteraction?> getDiscussionInteraction(
+  static Future<DiscussionUserInteraction?> getDiscussionInteraction(
       String documentId) async {
     try {
       final DocumentSnapshot doc =
@@ -53,7 +53,7 @@ class DiscussionInteractionDBManager {
   }
 
   // Get all discussion interactions for the current user
-  Stream<List<DiscussionUserInteraction>> getUserDiscussionInteractions() {
+  static Stream<List<DiscussionUserInteraction>> getUserDiscussionInteractions() {
     if (userId == null) {
       throw Exception('User must be logged in to get interactions');
     }
@@ -69,7 +69,7 @@ class DiscussionInteractionDBManager {
   }
 
   // Update an existing discussion interaction
-  Future<void> updateDiscussionInteraction(
+  static Future<void> updateDiscussionInteraction(
     String documentId,
     DiscussionInteraction updatedInteraction,
   ) async {
@@ -104,7 +104,7 @@ class DiscussionInteractionDBManager {
   }
 
   // Delete a discussion interaction
-  Future<void> deleteDiscussionInteraction(String documentId) async {
+  static Future<void> deleteDiscussionInteraction(String documentId) async {
     try {
       if (userId == null) {
         throw Exception('User must be logged in to delete an interaction');

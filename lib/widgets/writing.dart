@@ -13,6 +13,24 @@ class TypingScreen extends StatefulWidget {
 }
 
 class _TypingScreenState extends State<TypingScreen> {
+  Future<void> _saveData() async {
+    if (!checkCurrentTopicNotEmpty() ||
+        DiscusiaConfig.responseController.text.trim().isEmpty ||
+        DiscusiaConfig.currentTopic.isEmpty) {
+      return; // @TODO add an alert here
+    }
+    setState(() => DiscusiaConfig.isSavingState = true);
+    try {
+      await saveData();
+
+      DiscusiaConfig.setState(() {
+        DiscusiaConfig.tabController.animateTo(4);
+      });
+    } finally {
+      setState(() => DiscusiaConfig.isSavingState = false);
+    }
+  }
+
   // Second Tab: Writing Assistant Functionality
   @override
   Widget build(BuildContext context) {
@@ -76,10 +94,10 @@ class _TypingScreenState extends State<TypingScreen> {
                     IconButton(
                       icon: const Icon(LucideIcons.save),
                       onPressed: DiscusiaConfig.isSavingState ||
-                              DiscusiaConfig.currentTopic.isEmpty||
+                              DiscusiaConfig.currentTopic.isEmpty ||
                               DiscusiaConfig.evaluation.isEmpty
                           ? null
-                          : saveData,
+                          : _saveData,
                     ),
                     const Text("Save"),
                   ],
@@ -101,21 +119,20 @@ class _TypingScreenState extends State<TypingScreen> {
                         context, "Current Topic", DiscusiaConfig.currentTopic),
                     const SizedBox(height: 10),
                     TextField(
-                      controller: DiscusiaConfig.responseController,
-                      maxLines: 50, // Makes it expandable for long text
-                      keyboardType: TextInputType.multiline,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.0),
+                        controller: DiscusiaConfig.responseController,
+                        maxLines: 50, // Makes it expandable for long text
+                        keyboardType: TextInputType.multiline,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          labelText: "Write your essay here",
+                          alignLabelWithHint: true, // Aligns label to top
                         ),
-                        labelText: "Write your essay here",
-                        alignLabelWithHint: true, // Aligns label to top
-                      ),
-                      style: TextStyle(fontSize: 16.0),
-                      textAlignVertical: TextAlignVertical.top,
-                      minLines: 5, // Starts with 5 lines
-                      textCapitalization: TextCapitalization.sentences
-                    ),
+                        style: TextStyle(fontSize: 16.0),
+                        textAlignVertical: TextAlignVertical.top,
+                        minLines: 5, // Starts with 5 lines
+                        textCapitalization: TextCapitalization.sentences),
                     // const SizedBox(height: 10),
                     // buildCard(context, "Evaluation", DiscusiaConfig.evaluation),
                   ]),

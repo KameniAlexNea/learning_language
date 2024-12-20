@@ -1,6 +1,7 @@
 import 'package:discursia/db/discusia.dart';
 import 'package:discursia/widgets/history.dart';
 import 'package:flutter/material.dart';
+import '../db/discussion.dart';
 import '../utilities/auth_google.dart';
 import '../widgets/config.dart';
 import '../widgets/eval.dart';
@@ -50,6 +51,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   @override
   Widget build(BuildContext context) {
     final String name = GoogleAuthService.user!.displayName ?? '';
+    DiscussionInteractionDBManager.getUserDiscussionInteractions().forEach((action) => DiscusiaConfig.interactions.addAll(action));
     return Scaffold(
       appBar: AppBar(
         title: Text("Discursia, $name"),

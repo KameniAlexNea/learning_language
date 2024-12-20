@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../db/discusia.dart';
+import '../db/discussion.dart';
 import '../db/model.dart';
 import 'auth_google.dart';
 
@@ -132,28 +133,18 @@ Future<void> getSuggestedIdea() async {
 }
 
 Future<void> saveData() async {
-  if (!checkCurrentTopicNotEmpty() ||
-      DiscusiaConfig.responseController.text.trim().isEmpty ||
-      DiscusiaConfig.currentTopic.isEmpty) {
-    return;
-  }
-  DiscusiaConfig.setState(() => DiscusiaConfig.isSavingState = true);
-  try {
-    // collect and save data
-    final String text = DiscusiaConfig.responseController.text.trim();
-    DiscussionUserInteraction data = DiscussionUserInteraction(
-        userId: GoogleAuthService.user!.uid,
-        theme: DiscusiaConfig.currentTopic,
-        userAnswer: text,
-        evaluation: DiscusiaConfig.evaluation,
-        suggestedIdea: DiscusiaConfig.suggestedIdea,
-        suggestedAnswer: DiscusiaConfig.suggestedAnswer);
+  // collect and save data
+  DiscussionUserInteraction data = DiscussionUserInteraction(
+      userId: GoogleAuthService.user!.uid,
+      theme: DiscusiaConfig.currentTopic,
+      userAnswer: DiscusiaConfig.responseController.text.trim(),
+      evaluation: DiscusiaConfig.evaluation,
+      suggestedIdea: DiscusiaConfig.suggestedIdea,
+      suggestedAnswer: DiscusiaConfig.suggestedAnswer);
 
-    DiscusiaConfig.setState(() {
-      DiscusiaConfig.interactions.add(data);
-      DiscusiaConfig.tabController.animateTo(4);
-    });
-  } finally {
-    DiscusiaConfig.setState(() => DiscusiaConfig.isSavingState = false);
-  }
+  final docId =
+      await DiscussionInteractionDBManager.createDiscussionInteraction(data);
+  data.id = docId;
+
+  DiscusiaConfig.interactions.add(data);
 }

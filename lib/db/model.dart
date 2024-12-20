@@ -1,16 +1,18 @@
 class DiscussionInteraction {
+  String? id;
   final String theme;
   final String userAnswer;
   final String evaluation;
   final String suggestedIdea;
   final String suggestedAnswer;
 
-  const DiscussionInteraction({
+  DiscussionInteraction({
     required this.theme,
     required this.userAnswer,
     required this.evaluation,
     required this.suggestedIdea,
     required this.suggestedAnswer,
+    this.id,
   });
 
   Map<String, dynamic> toJson() => {
