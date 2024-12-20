@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../db/discusia.dart';
-import 'builder.dart';
+import 'card_builder.dart';
 
 class SuggestScreen extends StatefulWidget {
   const SuggestScreen({super.key});

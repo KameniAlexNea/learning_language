@@ -41,6 +41,13 @@ dependencies:
   flutter_dotenv: ^5.2.1
   shared_preferences: ^2.3.3
   lucide_icons: ^0.257.0
+  firebase_core: ^3.8.1
+  firebase_auth: ^5.3.4
+  google_fonts: ^6.2.1
+  cloud_firestore: ^5.5.1
+  google_sign_in: ^6.2.2
+  email_validator: ^3.0.0
+  password_field_validator: ^0.0.1
 
 dev_dependencies:
   flutter_test:

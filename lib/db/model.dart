@@ -1,46 +1,84 @@
 class DiscussionInteraction {
-  static int _nextId = 1; // Private static variable to track the next ID
+  final String theme;
+  final String userAnswer;
+  final String evaluation;
+  final String suggestedIdea;
+  final String suggestedAnswer;
 
-  final int id; // Unique ID for each interaction
-  final String theme; // The generated discussion theme
-  final String userAnswer; // User's response to the theme
-  final String evaluation; // Evaluation details
-  final String suggestedIdea; // Suggested idea
-  final String suggestedAnswer; // Suggested answer
-  final DateTime date; // Timestamp for when the interaction occurred
-
-  DiscussionInteraction({
-    int? id, // Optional ID parameter
+  const DiscussionInteraction({
     required this.theme,
     required this.userAnswer,
     required this.evaluation,
     required this.suggestedIdea,
     required this.suggestedAnswer,
-    DateTime? date, // Optional date parameter
-  })  : id = id ?? _nextId++, // Use provided ID or auto-increment
-        date = date ?? DateTime.now(); // Use provided date or current date
+  });
 
-  // Convert to JSON
   Map<String, dynamic> toJson() => {
-        'id': id,
         'theme': theme,
         'userAnswer': userAnswer,
         'evaluation': evaluation,
         'suggestedIdea': suggestedIdea,
         'suggestedAnswer': suggestedAnswer,
-        'date': date.toIso8601String(),
       };
 
-  // Create from JSON
-  factory DiscussionInteraction.fromJson(Map<String, dynamic> json) {
-    return DiscussionInteraction(
-      id: json['id'],
-      theme: json['theme'],
-      userAnswer: json['userAnswer'],
-      evaluation: json['evaluation'],
-      suggestedIdea: json['suggestedIdea'],
-      suggestedAnswer: json['suggestedAnswer'],
-      date: DateTime.parse(json['date']),
-    );
+  static DiscussionInteraction fromJson(Map<String, dynamic> json) {
+    try {
+      return DiscussionInteraction(
+        theme: json['theme'] ?? '',
+        userAnswer: json['userAnswer'] ?? '',
+        evaluation: json['evaluation'] ?? '',
+        suggestedIdea: json['suggestedIdea'] ?? '',
+        suggestedAnswer: json['suggestedAnswer'] ?? '',
+      );
+    } catch (e) {
+      throw FormatException('Error parsing DiscussionInteraction: $e');
+    }
+  }
+}
+
+class DiscussionUserInteraction extends DiscussionInteraction {
+  final String userId;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  DiscussionUserInteraction({
+    required this.userId,
+    required super.theme,
+    required super.userAnswer,
+    required super.evaluation,
+    required super.suggestedIdea,
+    required super.suggestedAnswer,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  })  : createdAt = createdAt ?? DateTime.now(),
+        updatedAt = updatedAt ?? DateTime.now();
+
+  @override
+  Map<String, dynamic> toJson() => {
+        ...super.toJson(),
+        'userId': userId,
+        'createdAt': createdAt.toIso8601String(),
+        'updatedAt': updatedAt.toIso8601String(),
+      };
+
+  static DiscussionUserInteraction fromJson(Map<String, dynamic> json) {
+    try {
+      return DiscussionUserInteraction(
+        theme: json['theme'] ?? '',
+        userAnswer: json['userAnswer'] ?? '',
+        evaluation: json['evaluation'] ?? '',
+        suggestedIdea: json['suggestedIdea'] ?? '',
+        suggestedAnswer: json['suggestedAnswer'] ?? '',
+        userId: json['userId'] ?? '',
+        createdAt: json['createdAt'] != null
+            ? DateTime.parse(json['createdAt'])
+            : null,
+        updatedAt: json['updatedAt'] != null
+            ? DateTime.parse(json['updatedAt'])
+            : null,
+      );
+    } catch (e) {
+      throw FormatException('Error parsing DiscussionUserInteraction: $e');
+    }
   }
 }

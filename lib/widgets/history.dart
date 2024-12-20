@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../db/model.dart';
 import './detail.dart';
-import 'builder.dart';
+import 'card_builder.dart';
 
 class HistoryPage extends StatelessWidget {
-  final List<DiscussionInteraction> interactions;
+  final List<DiscussionUserInteraction> interactions;
 
   const HistoryPage({super.key, required this.interactions});
 
@@ -37,7 +37,7 @@ class HistoryPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Date: ${interaction.date.toLocal().toString().split(' ')[0]}",
+                      "Date: ${interaction.createdAt.toLocal().toString().split(' ')[0]}",
                       style: TextStyle(color: Colors.grey.shade600),
                     ),
                   ],

@@ -140,3 +140,4 @@ app.*.symbols
 !.vscode/settings.json
 
 .env
+google-services.json

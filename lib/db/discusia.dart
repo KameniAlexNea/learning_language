@@ -29,7 +29,7 @@ class DiscusiaConfig {
   static final TextEditingController responseController =
       TextEditingController();
 
-  static final List<DiscussionInteraction> interactions = [];
+  static final List<DiscussionUserInteraction> interactions = [];
 
   static void clearInterface({bool withTopic = false}) {
     setState(() {

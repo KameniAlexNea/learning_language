@@ -3,26 +3,25 @@ import 'package:flutter/material.dart';
 
 import '../db/discusia.dart';
 import '../db/model.dart';
+import 'auth_google.dart';
 
+void showError(BuildContext context, String message) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.red,
+    ),
+  );
+}
 
-  void showError(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-
-  void showSuccess(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-      ),
-    );
-  }
-
+void showSuccess(BuildContext context, String message) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.green,
+    ),
+  );
+}
 
 bool checkCurrentTopicNotEmpty() {
   if (DiscusiaConfig.currentTopic.isEmpty) {
@@ -44,7 +43,6 @@ Future<void> generateTopic() async {
 
       DiscusiaConfig.setState(() {
         DiscusiaConfig.currentTopic = response ?? "No topic generated.";
-        
       });
       DiscusiaConfig.clearInterface();
     } on SocketException catch (e) {
@@ -143,7 +141,8 @@ Future<void> saveData() async {
   try {
     // collect and save data
     final String text = DiscusiaConfig.responseController.text.trim();
-    DiscussionInteraction data = DiscussionInteraction(
+    DiscussionUserInteraction data = DiscussionUserInteraction(
+        userId: GoogleAuthService.user!.uid,
         theme: DiscusiaConfig.currentTopic,
         userAnswer: text,
         evaluation: DiscusiaConfig.evaluation,

@@ -1,10 +1,10 @@
 import 'package:discursia/db/discusia.dart';
 import 'package:flutter/material.dart';
 import '../db/model.dart';
-import 'builder.dart';
+import 'card_builder.dart';
 
 class DetailPage extends StatelessWidget {
-  final DiscussionInteraction interaction;
+  final DiscussionUserInteraction interaction;
 
   const DetailPage({super.key, required this.interaction});
 
@@ -48,7 +48,7 @@ class DetailPage extends StatelessWidget {
               // Date Information
               SizedBox(height: 16),
               Text(
-                "Date: ${interaction.date.toLocal().toString().split(' ')[0]}",
+                "Date: ${interaction.createdAt.toLocal().toString().split(' ')[0]}",
                 style: TextStyle(
                   color: Colors.grey.shade600,
                   fontSize: 14,

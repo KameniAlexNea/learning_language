@@ -1,6 +1,8 @@
+import 'package:discursia/screens/login.dart';
 import 'package:flutter/material.dart';
 
 import '../db/discusia.dart';
+import '../utilities/auth_google.dart';
 import 'themeselector.dart';
 
 class ConfigScreen extends StatefulWidget {
@@ -21,6 +23,15 @@ class _ConfigScreenState extends State<ConfigScreen> {
     "Spanish",
     "Thai"
   ];
+
+  Future<void> signOut() async {
+    await GoogleAuthService.signOut();
+    if (mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +60,21 @@ class _ConfigScreenState extends State<ConfigScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            ThemeSelectorScreen()
+            ThemeSelectorScreen(),
+            ElevatedButton.icon(
+              onPressed: signOut,
+              icon: const Icon(Icons.logout),
+              label: const Text('Log Out'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+            ),
           ],
         ),
       ),
