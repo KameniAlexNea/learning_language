@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:password_field_validator/password_field_validator.dart';
 
 import '../db/database.dart';
+import 'home.dart';
 import 'login.dart';
 import '../utilities/auth_google.dart';
 
@@ -49,16 +50,12 @@ class _SignUpPageState extends State<SignUpPage> {
         return;
       }
 
-      setState(() => _isLoading = true);
       try {
         UserCredential userCredential =
             await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
-
-        await createUser(userCredential.user!.uid,
-            _usernameController.text.trim(), _emailController.text.trim());
 
         await userCredential.user!
             .updateProfile(displayName: _usernameController.text.trim());
@@ -67,6 +64,16 @@ class _SignUpPageState extends State<SignUpPage> {
 
         if (mounted) {
           await _showEmailVerificationDialog(userCredential.user!);
+        }
+
+        await createUser(userCredential.user!.uid,
+            _usernameController.text.trim(), _emailController.text.trim());
+
+        // Navigate to the main application after successful sign-up
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => WritingAssistantApp()),
+          );
         }
       } on FirebaseAuthException catch (e) {
         if (mounted) {

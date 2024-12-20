@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:email_validator/email_validator.dart';
 import '../utilities/auth_google.dart';
+import 'home.dart';
 import 'signup.dart';
 
 bool validateEmail(String email) {
@@ -40,6 +41,12 @@ class _LoginPageState extends State<LoginPage> {
           }
         } else {
           GoogleAuthService.user = userCredential.user;
+
+          if (mounted) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => WritingAssistantApp()),
+            );
+          }
         }
       } on FirebaseAuthException catch (e) {
         String errorMessage = 'Login failed';
@@ -121,6 +128,11 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         _isLoading = false;
       });
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => WritingAssistantApp()),
+        );
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
