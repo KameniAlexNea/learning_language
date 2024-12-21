@@ -8,7 +8,8 @@ import 'card_builder.dart';
 import '../utilities/topic_management.dart';
 
 class TypingScreen extends StatefulWidget {
-  const TypingScreen({super.key});
+  final TabController tabController;
+  const TypingScreen({super.key, required this.tabController});
 
   @override
   _TypingScreenState createState() => _TypingScreenState();
@@ -26,7 +27,7 @@ class _TypingScreenState extends State<TypingScreen> {
       await saveData();
 
       setState(() {
-        DiscusiaConfig.tabController.animateTo(4);
+        widget.tabController.animateTo(4);
       });
     } finally {
       setState(() => DiscusiaConfig.isSavingState = false);
@@ -74,7 +75,7 @@ class _TypingScreenState extends State<TypingScreen> {
         DiscusiaConfig.evaluation = response ?? "No evaluation generated.";
         DiscusiaConfig.errorMessage = "";
         if (response != null) {
-          DiscusiaConfig.tabController.animateTo(3);
+          widget.tabController.animateTo(3);
         }
       });
     } finally {
@@ -98,7 +99,7 @@ class _TypingScreenState extends State<TypingScreen> {
         DiscusiaConfig.errorMessage = "";
         // Switch to the Suggested Answer tab
         if (response != null) {
-          DiscusiaConfig.tabController.animateTo(2);
+          widget.tabController.animateTo(2);
         }
       });
     } finally {
@@ -121,7 +122,7 @@ class _TypingScreenState extends State<TypingScreen> {
         DiscusiaConfig.suggestedIdea = response ?? "No suggestion idea.";
         DiscusiaConfig.errorMessage = "";
         // Switch to the Suggested Answer tab
-        if (response != null) DiscusiaConfig.tabController.animateTo(2);
+        if (response != null) widget.tabController.animateTo(2);
       });
     } finally {
       setState(() => DiscusiaConfig.isGettingSuggestedIdea = false);

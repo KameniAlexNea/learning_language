@@ -1,6 +1,6 @@
-import '../utilities/prompts.dart';
 import 'package:flutter/material.dart';
 
+import '../utilities/prompts.dart';
 import '../api/llmservice.dart';
 import 'model.dart';
 
@@ -20,7 +20,7 @@ class DiscusiaConfig {
   static String selectedLanguage = "English";
   static Prompts get prompts => Prompts(selectedLanguage);
 
-  static late TabController tabController;
+  // static late TabController tabController;
   static Function get llmCall =>
       modelType == 0 ? askLLMOA : (modelType == 1 ? askLLMHF : askLLMGroq);
   // static late Function setState;

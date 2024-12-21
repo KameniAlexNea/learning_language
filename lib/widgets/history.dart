@@ -1,32 +1,12 @@
 import 'package:flutter/material.dart';
-import '../db/discussion.dart';
 import '../db/model.dart';
 import './detail.dart';
 import 'card_builder.dart';
 
-class HistoryPage extends StatefulWidget {
-  const HistoryPage({super.key});
+class HistoryPage extends StatelessWidget {
+  final Stream<List<DiscussionUserInteraction>> interactions;
 
-  @override
-  _HistoryPageState createState() => _HistoryPageState();
-}
-
-class _HistoryPageState extends State<HistoryPage> {
-  late Future<List<DiscussionUserInteraction>> _interactionsFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _interactionsFuture = _initializeInteractions();
-  }
-
-  Future<List<DiscussionUserInteraction>> _initializeInteractions() async {
-    final interactions = <DiscussionUserInteraction>[];
-    await for (var action in DiscussionInteractionDBManager.getUserDiscussionInteractions()) {
-      interactions.addAll(action);
-    }
-    return interactions;
-  }
+  const HistoryPage({super.key, required this.interactions});
 
   @override
   Widget build(BuildContext context) {
@@ -35,11 +15,13 @@ class _HistoryPageState extends State<HistoryPage> {
         title: const Text("Discussion History"),
         elevation: 1,
       ),
-      body: FutureBuilder<List<DiscussionUserInteraction>>(
-        future: _interactionsFuture,
+      body: StreamBuilder<List<DiscussionUserInteraction>>(
+        stream: interactions,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
           } else if (snapshot.hasError) {
             return Center(
               child: Text(
@@ -60,13 +42,15 @@ class _HistoryPageState extends State<HistoryPage> {
           }
 
           final interactions = snapshot.data!;
+
           return ListView.separated(
             itemCount: interactions.length,
             separatorBuilder: (context, index) => const Divider(height: 1),
             itemBuilder: (context, index) {
               final interaction = interactions[index];
               return ListTile(
-                title: buildCard(context, "Topic $index", interaction.theme),
+                title: buildCard(
+                  context, "Topic $index", interaction.theme),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

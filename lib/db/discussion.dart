@@ -92,21 +92,24 @@ class DiscussionInteractionDBManager {
   }
 
   // Get all discussion interactions for the current user
-  static Stream<List<DiscussionUserInteraction>>
-      getUserDiscussionInteractions() {
-    if (userId == null) {
-      throw Exception('User must be logged in to get interactions');
-    }
-
-    return _firestore
-        .collection(collectionName)
-        .where('userId', isEqualTo: userId)
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => DiscussionUserInteraction.fromJson(doc.data()))
-            .toList());
+  static Stream<List<DiscussionUserInteraction>> getUserDiscussionInteractions() {
+  if (userId == null) {
+    throw Exception('User must be logged in to get interactions');
   }
+
+  return _firestore
+      .collection(collectionName)
+      .where('userId', isEqualTo: userId)
+      .snapshots()
+      .map((snapshot) {
+        final interactions = snapshot.docs
+            .map((doc) => DiscussionUserInteraction.fromJson(doc.data()))
+            .toList();
+        // Sort in memory instead of in the query
+        interactions.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        return interactions;
+      });
+}
 
   // Update an existing discussion interaction
   static Future<void> updateDiscussionInteraction(

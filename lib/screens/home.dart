@@ -1,8 +1,8 @@
-import 'package:discursia/db/discusia.dart';
 import 'package:discursia/widgets/history.dart';
 import 'package:flutter/material.dart';
 // import '../db/discussion.dart';
 import '../db/auth_google.dart';
+import '../db/discussion.dart';
 import '../widgets/config.dart';
 import '../widgets/eval.dart';
 import '../widgets/suggest.dart';
@@ -31,21 +31,21 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   final TextEditingController apiKeyController = TextEditingController();
 
   TextEditingController responseController = TextEditingController();
+  late TabController tabController;
 
   @override
   void initState() {
     super.initState();
-
-    DiscusiaConfig.tabController = TabController(length: 5, vsync: this);
+    tabController = TabController(length: 5, vsync: this);
   }
 
-  @override
-  void dispose() {
-    DiscusiaConfig.tabController.dispose();
-    apiKeyController.dispose();
-    responseController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   DiscusiaConfig.tabController.dispose();
+  //   apiKeyController.dispose();
+  //   responseController.dispose();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
       appBar: AppBar(
         title: Text("Discursia, $name"),
         bottom: TabBar(
-          controller: DiscusiaConfig.tabController,
+          controller: tabController,
           tabs: const [
             Tab(icon: Icon(Icons.settings), text: "App Setting"),
             Tab(icon: Icon(Icons.article), text: "Writing Task"),
@@ -66,13 +66,13 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
         ),
       ),
       body: TabBarView(
-        controller: DiscusiaConfig.tabController,
+        controller: tabController,
         children: [
           // First Tab: API Key Configuration
           ConfigScreen(),
 
           // Second Tab: Writing Assistant Functionality
-          TypingScreen(),
+          TypingScreen(tabController: tabController),
 
           // Third Tab: Suggested Answer
           SuggestScreen(),
@@ -81,7 +81,7 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
           EvalScreen(),
 
           // 5th Tab: Saved History
-          HistoryPage()
+          HistoryPage(interactions: DiscussionInteractionDBManager.getUserDiscussionInteractions())
         ],
       ),
     );
