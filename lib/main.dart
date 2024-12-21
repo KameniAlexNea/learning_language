@@ -8,12 +8,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'firebase_options.dart';
 import 'utilities/storage_manager.dart';
 import 'screens/login.dart';
+import 'db/discusia.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Required for async calls in main
   await PreferencesManager.instance.init(); // Initialize SharedPreferences
   await dotenv.load(fileName: ".env");
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await DiscusiaConfig.init();
   runApp(DiscursiaAuthApp());
 }
 

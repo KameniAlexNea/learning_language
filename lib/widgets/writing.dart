@@ -60,7 +60,7 @@ class _TypingScreenState extends State<TypingScreen> {
   }
 
   Future<void> evaluateResponse() async {
-    if (!checkCurrentTopicNotEmpty()) {
+    if (!checkCurrentTopicNotEmpty() || DiscusiaConfig.responseController.text.isEmpty) {
       return;
     }
     setState(() => DiscusiaConfig.isEvaluatingResponse = true);
