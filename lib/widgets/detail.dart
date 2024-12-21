@@ -9,13 +9,11 @@ class DetailPage extends StatelessWidget {
   const DetailPage({super.key, required this.interaction});
 
   void editAnswer(DiscussionInteraction interaction) {
-    DiscusiaConfig.setState(() {
-      DiscusiaConfig.currentTopic = interaction.theme;
-      DiscusiaConfig.evaluation = interaction.evaluation;
-      DiscusiaConfig.suggestedIdea = interaction.suggestedIdea;
-      DiscusiaConfig.suggestedAnswer = interaction.suggestedAnswer;
-      DiscusiaConfig.responseController.text = interaction.userAnswer;
-    });
+    DiscusiaConfig.currentTopic = interaction.theme;
+    DiscusiaConfig.evaluation = interaction.evaluation;
+    DiscusiaConfig.suggestedIdea = interaction.suggestedIdea;
+    DiscusiaConfig.suggestedAnswer = interaction.suggestedAnswer;
+    DiscusiaConfig.responseController.text = interaction.userAnswer;
     DiscusiaConfig.tabController.animateTo(1);
   }
 

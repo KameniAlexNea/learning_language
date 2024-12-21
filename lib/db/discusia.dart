@@ -23,7 +23,7 @@ class DiscusiaConfig {
   static late TabController tabController;
   static Function get llmCall =>
       modelType == 0 ? askLLMOA : (modelType == 1 ? askLLMHF : askLLMGroq);
-  static late Function setState;
+  // static late Function setState;
   static final modelType = 2; // 0: OpenAI, 1: HF, 2: Groq
   static final TextEditingController responseController =
       TextEditingController();
@@ -31,22 +31,20 @@ class DiscusiaConfig {
   static List<DiscussionUserInteraction> interactions = [];
 
   static void clearInterface({bool withTopic = false}) {
-    setState(() {
-      errorMessage = "";
-      evaluation = "";
-      suggestedAnswer = "";
-      suggestedIdea = "";
+    errorMessage = "";
+    evaluation = "";
+    suggestedAnswer = "";
+    suggestedIdea = "";
 
-      isEvaluatingResponse = false;
-      isGettingSuggestedAnswer = false;
-      isGettingSuggestedIdea = false;
-      isSavingState = false;
+    isEvaluatingResponse = false;
+    isGettingSuggestedAnswer = false;
+    isGettingSuggestedIdea = false;
+    isSavingState = false;
 
-      responseController.text = "";
-      if (withTopic) {
-        currentTopic = "";
-        isGeneratingTopic = false;
-      }
-    });
+    responseController.text = "";
+    if (withTopic) {
+      currentTopic = "";
+      isGeneratingTopic = false;
+    }
   }
 }
