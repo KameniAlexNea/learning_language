@@ -2,7 +2,7 @@ import 'package:discursia/screens/login.dart';
 import 'package:flutter/material.dart';
 
 import '../db/discusia.dart';
-import '../utilities/auth_google.dart';
+import '../db/auth_google.dart';
 import 'themeselector.dart';
 
 class ConfigScreen extends StatefulWidget {

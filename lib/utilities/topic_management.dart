@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../db/discusia.dart';
 import '../db/discussion.dart';
 import '../db/model.dart';
-import 'auth_google.dart';
+import '../db/auth_google.dart';
 
 void showError(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(

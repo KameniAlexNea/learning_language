@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:email_validator/email_validator.dart';
-import '../utilities/auth_google.dart';
+import '../db/auth_google.dart';
 import 'home.dart';
 import 'signup.dart';
 

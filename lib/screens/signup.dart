@@ -4,9 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:password_field_validator/password_field_validator.dart';
 import 'package:email_validator/email_validator.dart';
-import '../db/database.dart';
+import '../db/discussion.dart';
 import 'login.dart';
-import '../utilities/auth_google.dart';
+import '../db/auth_google.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -37,8 +37,8 @@ class _SignUpPageState extends State<SignUpPage> {
 
       setState(() => _isLoading = true);
 
-      bool isUsernameAvailable =
-          await checkUsernameAvailability(_usernameController.text.trim());
+      bool isUsernameAvailable = await UserDBManager.checkUsernameAvailability(
+          _usernameController.text.trim());
       if (!isUsernameAvailable) {
         setState(() => _isLoading = false);
         if (mounted) {
@@ -65,7 +65,7 @@ class _SignUpPageState extends State<SignUpPage> {
           await _showEmailVerificationDialog(userCredential.user!);
         }
 
-        await createUser(userCredential.user!.uid,
+        await UserDBManager.createUser(userCredential.user!.uid,
             _usernameController.text.trim(), _emailController.text.trim());
 
         // Navigate to the main application after successful sign-up
@@ -100,10 +100,11 @@ class _SignUpPageState extends State<SignUpPage> {
 
       final user = userCredential!.user;
       if (user != null) {
-        final userDoc = await getUser(user.uid);
+        final userDoc = await UserDBManager.getUser(user.uid);
 
         if (!userDoc.exists) {
-          await createUser(user.uid, user.displayName ?? '', user.email ?? '');
+          await UserDBManager.createUser(
+              user.uid, user.displayName ?? '', user.email ?? '');
         }
 
         if (mounted) {

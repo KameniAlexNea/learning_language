@@ -2,7 +2,7 @@ import 'package:discursia/db/discusia.dart';
 import 'package:discursia/widgets/history.dart';
 import 'package:flutter/material.dart';
 // import '../db/discussion.dart';
-import '../utilities/auth_google.dart';
+import '../db/auth_google.dart';
 import '../widgets/config.dart';
 import '../widgets/eval.dart';
 import '../widgets/suggest.dart';

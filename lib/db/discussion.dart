@@ -1,7 +1,46 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../utilities/auth_google.dart';
+import 'auth_google.dart';
 import 'model.dart';
+
+class UserDBManager {
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final String collectionName = 'users';
+
+  static Future<bool> checkUsernameAvailability(String username) async {
+    try {
+      // Check Firestore for existing username
+      final querySnapshot = await _firestore
+          .collection(collectionName)
+          .where('username', isEqualTo: username)
+          .get();
+
+      return querySnapshot.docs.isEmpty;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<void> createUser(String uid, String username, String email) {
+    return _firestore.collection(collectionName).doc(uid).set({
+      'username': username,
+      'email': email,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  static Future<DocumentSnapshot<Map<String, dynamic>>> getUser(String uid) {
+    final data = _firestore.collection(collectionName).doc(uid).get();
+    return data;
+  }
+
+  static Future<void> updateFirestoreUser(
+      String userId, String displayName) async {
+    await _firestore.collection(collectionName).doc(userId).update({
+      'displayName': displayName,
+    });
+  }
+}
 
 class DiscussionInteractionDBManager {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -53,7 +92,8 @@ class DiscussionInteractionDBManager {
   }
 
   // Get all discussion interactions for the current user
-  static Stream<List<DiscussionUserInteraction>> getUserDiscussionInteractions() {
+  static Stream<List<DiscussionUserInteraction>>
+      getUserDiscussionInteractions() {
     if (userId == null) {
       throw Exception('User must be logged in to get interactions');
     }
