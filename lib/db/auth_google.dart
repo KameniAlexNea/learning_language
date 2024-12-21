@@ -25,7 +25,7 @@ class GoogleAuthService {
         idToken: googleAuth.idToken,
       );
 
-      return await FirebaseAuth.instance.signInWithCredential(credential);
+      return await _auth.signInWithCredential(credential);
     } catch (e) {
       if (kDebugMode) {
         print('Sign In Error: $e');

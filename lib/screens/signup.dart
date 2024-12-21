@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:password_field_validator/password_field_validator.dart';
 import 'package:email_validator/email_validator.dart';
 import '../db/discussion.dart';
+import '../utilities/topic_management.dart';
 import 'login.dart';
 import '../db/auth_google.dart';
 
@@ -28,9 +29,7 @@ class _SignUpPageState extends State<SignUpPage> {
     if (_formKey.currentState!.validate()) {
       if (_passwordController.text != _confirmPasswordController.text) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Passwords do not match')),
-          );
+          showError(context, 'Passwords do not match');
         }
         return;
       }
@@ -42,9 +41,7 @@ class _SignUpPageState extends State<SignUpPage> {
       if (!isUsernameAvailable) {
         setState(() => _isLoading = false);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Username is already taken')),
-          );
+          showError(context, 'Username is already taken');
         }
         return;
       }
@@ -76,9 +73,7 @@ class _SignUpPageState extends State<SignUpPage> {
         }
       } on FirebaseAuthException catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(_getErrorMessage(e.code))),
-          );
+          showError(context, _getErrorMessage(e.code));
         }
       } finally {
         if (mounted) {
@@ -116,9 +111,7 @@ class _SignUpPageState extends State<SignUpPage> {
       }
     } on FirebaseAuthException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Google sign-up failed: ${e.message}')),
-        );
+        showError(context, 'Google sign-up failed: ${e.code}');
       }
     } finally {
       setState(() => _isLoading = false);
@@ -162,9 +155,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 await user.sendEmailVerification();
                 if (mounted) {
                   Navigator.of(this.context).pop();
-                  ScaffoldMessenger.of(this.context).showSnackBar(
-                    SnackBar(content: Text('Verification email sent')),
-                  );
+                  showSuccess(this.context, 'Verification email sent');
                 }
               },
             ),

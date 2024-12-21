@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
@@ -20,15 +21,22 @@ class _TypingScreenState extends State<TypingScreen> {
     if (!checkCurrentTopicNotEmpty() ||
         DiscusiaConfig.responseController.text.trim().isEmpty ||
         DiscusiaConfig.currentTopic.isEmpty) {
-      return; // @TODO add an alert here
+      showError(
+        context,
+        "Please complete the following steps before saving data:\n"
+        "1. Generate a topic\n"
+        "2. Fill in some text\n"
+        "3. Evaluate the topic",
+      );
+      return;
     }
     setState(() => DiscusiaConfig.isSavingState = true);
     try {
       await saveData();
 
-      setState(() {
-        widget.tabController.animateTo(4);
-      });
+      widget.tabController.animateTo(4);
+    } on FirebaseException catch (e) {
+      if (mounted) showError(context, e.code);
     } finally {
       setState(() => DiscusiaConfig.isSavingState = false);
     }
@@ -60,7 +68,14 @@ class _TypingScreenState extends State<TypingScreen> {
   }
 
   Future<void> evaluateResponse() async {
-    if (!checkCurrentTopicNotEmpty() || DiscusiaConfig.responseController.text.isEmpty) {
+    if (!checkCurrentTopicNotEmpty() ||
+        DiscusiaConfig.responseController.text.isEmpty) {
+      showError(
+        context,
+        "Please complete the following steps before evaluation:\n"
+        "1. Generate a topic\n"
+        "2. Fill in some text\n"
+      );
       return;
     }
     setState(() => DiscusiaConfig.isEvaluatingResponse = true);
@@ -85,6 +100,10 @@ class _TypingScreenState extends State<TypingScreen> {
 
   Future<void> getSuggestedAnswer() async {
     if (!checkCurrentTopicNotEmpty()) {
+      showError(
+        context,
+        "To suggest an answer, you have to generate first a discussion topic"
+      );
       return;
     }
     setState(() => DiscusiaConfig.isGettingSuggestedAnswer = true);
@@ -109,6 +128,10 @@ class _TypingScreenState extends State<TypingScreen> {
 
   Future<void> getSuggestedIdea() async {
     if (!checkCurrentTopicNotEmpty()) {
+      showError(
+        context,
+        "To suggest ideas, you have to generate first a discussion topic"
+      );
       return;
     }
     setState(() => DiscusiaConfig.isGettingSuggestedIdea = true);

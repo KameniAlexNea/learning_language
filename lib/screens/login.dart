@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:email_validator/email_validator.dart';
 import '../db/auth_google.dart';
+import '../utilities/topic_management.dart';
 import 'home.dart';
 import 'signup.dart';
 
@@ -63,9 +64,7 @@ class _LoginPageState extends State<LoginPage> {
         }
 
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(errorMessage)),
-          );
+          showError(context, errorMessage );
         }
       } finally {
         if (mounted) setState(() => _isLoading = false);
@@ -98,9 +97,7 @@ class _LoginPageState extends State<LoginPage> {
                 await user.sendEmailVerification();
                 if (mounted) {
                   Navigator.of(this.context).pop();
-                  ScaffoldMessenger.of(this.context).showSnackBar(
-                    SnackBar(content: Text('Verification email sent')),
-                  );
+                  showSuccess(this.context, 'Verification email sent');
                 }
               },
             ),
@@ -130,9 +127,7 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Google Sign-In failed: $e')),
-        );
+        showError(context, 'Google Sign-In failed: $e');
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
