@@ -44,7 +44,7 @@ class UserDBManager {
 
 class DiscussionInteractionDBManager {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  static final String? userId = GoogleAuthService.user?.uid;
+  static final String? userId = GoogleAuthService.currentUser?.uid;
   static final String collectionName = 'discussion_interactions';
 
   // Create a new discussion interaction

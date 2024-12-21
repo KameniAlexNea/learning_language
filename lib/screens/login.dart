@@ -36,7 +36,6 @@ class _LoginPageState extends State<LoginPage> {
             await _showEmailVerificationDialog(userCredential.user!);
           }
         } else {
-          GoogleAuthService.user = userCredential.user;
 
           if (mounted) {
             Navigator.of(context).pushReplacement(

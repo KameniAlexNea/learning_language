@@ -5,23 +5,33 @@ import 'package:google_sign_in/google_sign_in.dart';
 class GoogleAuthService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final GoogleSignIn _googleSignIn = GoogleSignIn();
-  static late User? user;
+  
+  // Stream to listen to auth state changes
+  static Stream<User?> get authStateChanges => _auth.authStateChanges();
+  
+  // Get current user synchronously
+  static User? get currentUser => _auth.currentUser;
 
   static Future<UserCredential?> signIn() async {
-    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-    if (googleUser == null) return null;
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) return null;
 
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
+      final GoogleSignInAuthentication googleAuth = 
+          await googleUser.authentication;
 
-    UserCredential userCredential =
-        await FirebaseAuth.instance.signInWithCredential(credential);
-    user = userCredential.user;
-    return userCredential;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      return await FirebaseAuth.instance.signInWithCredential(credential);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Sign In Error: $e');
+      }
+      rethrow;
+    }
   }
 
   static Future<void> signOut() async {
@@ -32,6 +42,7 @@ class GoogleAuthService {
       if (kDebugMode) {
         print('Sign Out Error: $e');
       }
+      rethrow;
     }
   }
 }

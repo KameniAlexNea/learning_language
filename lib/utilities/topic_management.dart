@@ -36,7 +36,7 @@ bool checkCurrentTopicNotEmpty() {
 Future<void> saveData() async {
   // collect and save data
   DiscussionUserInteraction data = DiscussionUserInteraction(
-      userId: GoogleAuthService.user!.uid,
+      userId: GoogleAuthService.currentUser!.uid,
       theme: DiscusiaConfig.currentTopic,
       userAnswer: DiscusiaConfig.responseController.text.trim(),
       evaluation: DiscusiaConfig.evaluation,
