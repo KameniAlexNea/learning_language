@@ -191,7 +191,7 @@ class _TypingScreenState extends State<TypingScreen> {
                     IconButton(
                       icon: const Icon(LucideIcons.lightbulb),
                       onPressed: DiscusiaConfig.isGettingSuggestedIdea ||
-                              DiscusiaConfig.currentTopic.isEmpty
+                              DiscusiaConfig.currentTopic.isEmpty || DiscusiaConfig.currentTopicHasIdea
                           ? null
                           : getSuggestedIdea,
                     ),
@@ -203,7 +203,7 @@ class _TypingScreenState extends State<TypingScreen> {
                     IconButton(
                       icon: const Icon(LucideIcons.messageCircle),
                       onPressed: DiscusiaConfig.isGettingSuggestedAnswer ||
-                              DiscusiaConfig.currentTopic.isEmpty
+                              DiscusiaConfig.currentTopic.isEmpty || DiscusiaConfig.currentTopicHasAnswer
                           ? null
                           : getSuggestedAnswer,
                     ),
