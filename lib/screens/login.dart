@@ -145,8 +145,8 @@ class _LoginPageState extends State<LoginPage> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFF1a237e), // Dark blue
-              Color(0xFF000000), // Black
+              Colors.white54,
+              Colors.white, // Black
             ],
           ),
         ),
@@ -168,7 +168,7 @@ class _LoginPageState extends State<LoginPage> {
                         style: GoogleFonts.roboto(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: Colors.black,
                         ),
                       ),
                       SizedBox(height: 8),
@@ -176,28 +176,28 @@ class _LoginPageState extends State<LoginPage> {
                         'Discover, discuss, and improve your language skills with Discursia',
                         style: GoogleFonts.roboto(
                           fontSize: 16,
-                          color: Colors.white70,
+                          color: Colors.black87,
                           height: 1.5,
                         ),
                       ),
                       SizedBox(height: 32),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.black.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: TextFormField(
                           controller: _emailController,
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             hintText: 'Email',
-                            hintStyle: TextStyle(color: Colors.white60),
+                            hintStyle: TextStyle(color: Colors.black54),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
                             prefixIcon:
-                                Icon(Icons.email, color: Colors.white70),
+                                Icon(Icons.email, color: Colors.black87),
                             contentPadding: EdgeInsets.symmetric(vertical: 16),
                           ),
                           validator: (value) {
@@ -214,28 +214,28 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(height: 16),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.black.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: TextFormField(
                           controller: _passwordController,
                           obscureText:
                               _obscurePassword, // Add this variable to your state
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             hintText: 'Password',
-                            hintStyle: TextStyle(color: Colors.white60),
+                            hintStyle: TextStyle(color: Colors.black54),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
-                            prefixIcon: Icon(Icons.lock, color: Colors.white70),
+                            prefixIcon: Icon(Icons.lock, color: Colors.black87),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscurePassword
                                     ? Icons.visibility_off
                                     : Icons.visibility,
-                                color: Colors.white70,
+                                color: Colors.black87,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -257,11 +257,11 @@ class _LoginPageState extends State<LoginPage> {
                       _isLoading
                           ? Center(
                               child: CircularProgressIndicator(
-                                  color: Colors.white))
+                                  color: Colors.black))
                           : ElevatedButton(
                               onPressed: _login,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
+                                backgroundColor: Colors.grey.shade50,
                                 foregroundColor: Color(0xFF1a237e),
                                 padding: EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
@@ -273,15 +273,15 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(height: 16),
                       Row(
                         children: [
-                          Expanded(child: Divider(color: Colors.white38)),
+                          Expanded(child: Divider(color: Colors.black38)),
                           Padding(
                             padding: EdgeInsets.symmetric(horizontal: 16),
                             child: Text(
                               'OR',
-                              style: TextStyle(color: Colors.white70),
+                              style: TextStyle(color: Colors.black87),
                             ),
                           ),
-                          Expanded(child: Divider(color: Colors.white38)),
+                          Expanded(child: Divider(color: Colors.black38)),
                         ],
                       ),
                       SizedBox(height: 16),
@@ -290,8 +290,8 @@ class _LoginPageState extends State<LoginPage> {
                         icon: Icon(Icons.g_mobiledata),
                         label: Text('Continue with Google'),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          side: BorderSide(color: Colors.white38),
+                          foregroundColor: Colors.black,
+                          side: BorderSide(color: Colors.black38),
                           padding: EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -304,7 +304,7 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           Text(
                             "Don't have an account? ",
-                            style: TextStyle(color: Colors.white70),
+                            style: TextStyle(color: Colors.black87),
                           ),
                           TextButton(
                             onPressed: () {
@@ -317,7 +317,7 @@ class _LoginPageState extends State<LoginPage> {
                             },
                             child: Text(
                               'Sign up',
-                              style: TextStyle(color: Colors.white),
+                              style: TextStyle(color: Colors.black),
                             ),
                           ),
                         ],

@@ -188,8 +188,8 @@ class _SignUpPageState extends State<SignUpPage> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFF1a237e), // Dark blue
-              Color(0xFF000000), // Black
+              Colors.white54,
+              Colors.white,
             ],
           ),
         ),
@@ -210,7 +210,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         style: GoogleFonts.roboto(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: Colors.black,
                         ),
                       ),
                       SizedBox(height: 8),
@@ -218,27 +218,27 @@ class _SignUpPageState extends State<SignUpPage> {
                         'Join Discursia and start your language learning journey',
                         style: GoogleFonts.roboto(
                           fontSize: 16,
-                          color: Colors.white70,
+                          color: Colors.black87,
                           height: 1.5,
                         ),
                       ),
                       SizedBox(height: 32),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.black.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: TextFormField(
                           controller: _usernameController,
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             hintText: 'Username',
-                            hintStyle: TextStyle(color: Colors.white60),
+                            hintStyle: TextStyle(color: Colors.black54),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
-                            prefixIcon: Icon(Icons.person, color: Colors.white70),
+                            prefixIcon: Icon(Icons.person, color: Colors.black87),
                             contentPadding: EdgeInsets.symmetric(vertical: 16),
                           ),
                           validator: (value) {
@@ -255,20 +255,20 @@ class _SignUpPageState extends State<SignUpPage> {
                       SizedBox(height: 16),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.black.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: TextFormField(
                           controller: _emailController,
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             hintText: 'Email',
-                            hintStyle: TextStyle(color: Colors.white60),
+                            hintStyle: TextStyle(color: Colors.black54),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
-                            prefixIcon: Icon(Icons.email, color: Colors.white70),
+                            prefixIcon: Icon(Icons.email, color: Colors.black87),
                             contentPadding: EdgeInsets.symmetric(vertical: 16),
                           ),
                           validator: (value) {
@@ -285,27 +285,27 @@ class _SignUpPageState extends State<SignUpPage> {
                       SizedBox(height: 16),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.black.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: TextFormField(
                           controller: _passwordController,
                           obscureText: _obscurePassword,
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             hintText: 'Password',
-                            hintStyle: TextStyle(color: Colors.white60),
+                            hintStyle: TextStyle(color: Colors.black54),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
-                            prefixIcon: Icon(Icons.lock, color: Colors.white70),
+                            prefixIcon: Icon(Icons.lock, color: Colors.black87),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscurePassword
                                     ? Icons.visibility_off
                                     : Icons.visibility,
-                                color: Colors.white70,
+                                color: Colors.black87,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -327,7 +327,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         child: Theme(
                           data: ThemeData(
-                            textTheme: Typography.whiteRedmond,
+                            textTheme: Typography.blackRedmond,
                           ),
                           child: PasswordFieldValidator(
                             minLength: 8,
@@ -335,7 +335,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             lowercaseCharCount: 2,
                             numericCharCount: 2,
                             specialCharCount: 1,
-                            defaultColor: Colors.white54,
+                            defaultColor: Colors.black54,
                             successColor: Colors.green,
                             failureColor: Colors.red.shade300,
                             controller: _passwordController,
@@ -344,21 +344,21 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.black.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: TextFormField(
                           controller: _confirmPasswordController,
                           obscureText: true,
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             hintText: 'Confirm Password',
-                            hintStyle: TextStyle(color: Colors.white60),
+                            hintStyle: TextStyle(color: Colors.black54),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
-                            prefixIcon: Icon(Icons.lock_outline, color: Colors.white70),
+                            prefixIcon: Icon(Icons.lock_outline, color: Colors.black87),
                             contentPadding: EdgeInsets.symmetric(vertical: 16),
                           ),
                           validator: (value) {
@@ -374,7 +374,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                       SizedBox(height: 24),
                       if (_isLoading)
-                        Center(child: CircularProgressIndicator(color: Colors.white))
+                        Center(child: CircularProgressIndicator(color: Colors.black))
                       else
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -382,7 +382,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             ElevatedButton(
                               onPressed: _signUp,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
+                                backgroundColor: Colors.grey.shade50,
                                 foregroundColor: Color(0xFF1a237e),
                                 padding: EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
@@ -394,15 +394,15 @@ class _SignUpPageState extends State<SignUpPage> {
                             SizedBox(height: 16),
                             Row(
                               children: [
-                                Expanded(child: Divider(color: Colors.white38)),
+                                Expanded(child: Divider(color: Colors.black38)),
                                 Padding(
                                   padding: EdgeInsets.symmetric(horizontal: 16),
                                   child: Text(
                                     'OR',
-                                    style: TextStyle(color: Colors.white70),
+                                    style: TextStyle(color: Colors.black87),
                                   ),
                                 ),
-                                Expanded(child: Divider(color: Colors.white38)),
+                                Expanded(child: Divider(color: Colors.black38)),
                               ],
                             ),
                             SizedBox(height: 16),
@@ -411,8 +411,8 @@ class _SignUpPageState extends State<SignUpPage> {
                               icon: Icon(Icons.g_mobiledata),
                               label: Text('Sign up with Google'),
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                side: BorderSide(color: Colors.white38),
+                                foregroundColor: Colors.black,
+                                side: BorderSide(color: Colors.black38),
                                 padding: EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -427,7 +427,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         children: [
                           Text(
                             "Already have an account? ",
-                            style: TextStyle(color: Colors.white70),
+                            style: TextStyle(color: Colors.black87),
                           ),
                           TextButton(
                             onPressed: () {
@@ -439,7 +439,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             },
                             child: Text(
                               'Log in',
-                              style: TextStyle(color: Colors.white),
+                              style: TextStyle(color: Colors.black),
                             ),
                           ),
                         ],
