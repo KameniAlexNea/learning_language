@@ -1,5 +1,5 @@
 class DiscussionInteraction {
-  String? id;
+  String? uid;
   final String theme;
   final String userAnswer;
   final String evaluation;
@@ -12,7 +12,7 @@ class DiscussionInteraction {
     required this.evaluation,
     required this.suggestedIdea,
     required this.suggestedAnswer,
-    this.id,
+    this.uid,
   });
 
   Map<String, dynamic> toJson() => {
@@ -27,6 +27,7 @@ class DiscussionInteraction {
     try {
       return DiscussionInteraction(
         theme: json['theme'] ?? '',
+        uid: json['uid'] ?? '',
         userAnswer: json['userAnswer'] ?? '',
         evaluation: json['evaluation'] ?? '',
         suggestedIdea: json['suggestedIdea'] ?? '',
@@ -52,6 +53,7 @@ class DiscussionUserInteraction extends DiscussionInteraction {
     required super.suggestedAnswer,
     DateTime? createdAt,
     DateTime? updatedAt,
+    super.uid,
   })  : createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
 
@@ -63,7 +65,7 @@ class DiscussionUserInteraction extends DiscussionInteraction {
         'updatedAt': updatedAt.toIso8601String(),
       };
 
-  static DiscussionUserInteraction fromJson(Map<String, dynamic> json) {
+  static DiscussionUserInteraction fromJson(String docid, Map<String, dynamic> json) {
     try {
       return DiscussionUserInteraction(
         theme: json['theme'] ?? '',
@@ -74,6 +76,7 @@ class DiscussionUserInteraction extends DiscussionInteraction {
         userId: json['userId'] ?? '',
         createdAt: json['createdAt']?.toDate(),
         updatedAt: json['updatedAt']?.toDate(),
+        uid: docid,
       );
     } catch (e) {
       throw FormatException('Error parsing DiscussionUserInteraction: $e');

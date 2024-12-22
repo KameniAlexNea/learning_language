@@ -85,7 +85,7 @@ class DiscussionInteractionDBManager {
       }
 
       final data = doc.data() as Map<String, dynamic>;
-      return DiscussionUserInteraction.fromJson(data);
+      return DiscussionUserInteraction.fromJson(doc.id, data);
     } catch (e) {
       throw Exception('Failed to get discussion interaction: $e');
     }
@@ -103,7 +103,7 @@ class DiscussionInteractionDBManager {
       .snapshots()
       .map((snapshot) {
         final interactions = snapshot.docs
-            .map((doc) => DiscussionUserInteraction.fromJson(doc.data()))
+            .map((doc) => DiscussionUserInteraction.fromJson(doc.id, doc.data()))
             .toList();
         // Sort in memory instead of in the query
         interactions.sort((a, b) => b.createdAt.compareTo(a.createdAt));

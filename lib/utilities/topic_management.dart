@@ -45,7 +45,7 @@ Future<void> saveData() async {
 
   final docId =
       await DiscussionInteractionDBManager.createDiscussionInteraction(data);
-  data.id = docId;
+  data.uid = docId;
 
   DiscusiaConfig.interactions.add(data);
 }

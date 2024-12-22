@@ -1,5 +1,7 @@
 import 'package:discursia/db/discusia.dart';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
+import '../db/discussion.dart';
 import '../db/model.dart';
 import 'card_builder.dart';
 
@@ -8,17 +10,52 @@ class DetailPage extends StatelessWidget {
 
   const DetailPage({super.key, required this.interaction});
 
-  void editAnswer(DiscussionInteraction interaction) {
+  void editAnswer(DiscussionInteraction interaction, BuildContext context) {
     DiscusiaConfig.currentTopic = interaction.theme;
     DiscusiaConfig.evaluation = interaction.evaluation;
     DiscusiaConfig.suggestedIdea = interaction.suggestedIdea;
     DiscusiaConfig.suggestedAnswer = interaction.suggestedAnswer;
     DiscusiaConfig.responseController.text = interaction.userAnswer;
     // DiscusiaConfig.tabController.animateTo(1);
+    Navigator.pop(context);
+  }
+
+  void deleteAnswer(
+      DiscussionUserInteraction interaction, BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Confirm Deletion"),
+          content: Text("Are you sure you want to delete this answer?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                final String? uid = interaction.uid;
+                if (uid != null) {
+                  DiscussionInteractionDBManager.deleteDiscussionInteraction(
+                      uid);
+                  Navigator.of(context).pop(); // Close the dialog
+                }
+              },
+              child: Text("Delete"),
+            ),
+          ],
+        );
+      },
+    );
+    Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
+    final uid = DiscussionInteractionDBManager.userId;
     return Scaffold(
       appBar: AppBar(
         title: Text("Interaction Details"),
@@ -36,7 +73,10 @@ class DetailPage extends StatelessWidget {
               SizedBox(height: 16),
 
               // User Answer Section
-              buildCard(context, "Your Response", interaction.userAnswer),
+              buildCard(
+                  context,
+                  "${interaction.userId == uid ? "Your" : "User"} Response",
+                  interaction.userAnswer),
 
               SizedBox(height: 16),
 
@@ -54,19 +94,31 @@ class DetailPage extends StatelessWidget {
               ),
 
               SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () => editAnswer(interaction),
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Column(
+                    children: [
+                      IconButton(
+                        icon: const Icon(LucideIcons.edit),
+                        onPressed: () => editAnswer(interaction, context),
+                      ),
+                      const Text("Edit"),
+                    ],
                   ),
-                ),
-                child: Text(
-                  'Edit your response',
-                  style: TextStyle(fontSize: 16),
-                ),
-              )
+                  Column(
+                    children: [
+                      IconButton(
+                        icon: const Icon(LucideIcons.delete),
+                        onPressed: (interaction.userId != uid)
+                            ? null
+                            : () => deleteAnswer(interaction, context),
+                      ),
+                      const Text("Delete"),
+                    ],
+                  )
+                ],
+              ),
             ],
           ),
         ),

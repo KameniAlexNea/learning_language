@@ -21,8 +21,8 @@ class DiscusiaConfig {
   static const String _errorMessageKey = 'error_message';
 
   // checker to avoid multiple ideas generated
-  static bool currentTopicHasIdea = false;
-  static bool currentTopicHasAnswer = false;
+  static get currentTopicHasIdea => suggestedIdea.isNotEmpty;
+  static get currentTopicHasAnswer => suggestedAnswer.isNotEmpty;
 
   // Getters and setters with persistence
   static String _errorMessage = "";
@@ -36,8 +36,6 @@ class DiscusiaConfig {
   static String get currentTopic => _currentTopic;
   static set currentTopic(String value) {
     _currentTopic = value;
-    currentTopicHasIdea = false;
-    currentTopicHasAnswer = false;
     _prefs.setString(_topicKey, value);
   }
 
@@ -52,7 +50,6 @@ class DiscusiaConfig {
   static String get suggestedAnswer => _suggestedAnswer;
   static set suggestedAnswer(String value) {
     _suggestedAnswer = value;
-    currentTopicHasAnswer = value.isNotEmpty;
     _prefs.setString(_suggestedAnswerKey, value);
   }
 
@@ -60,7 +57,6 @@ class DiscusiaConfig {
   static String get suggestedIdea => _suggestedIdea;
   static set suggestedIdea(String value) {
     _suggestedIdea = value;
-    currentTopicHasIdea = value.isNotEmpty;
     _prefs.setString(_suggestedIdeaKey, value);
   }
 
