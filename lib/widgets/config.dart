@@ -61,20 +61,6 @@ class _ConfigScreenState extends State<ConfigScreen> {
             ),
             const SizedBox(height: 10),
             ThemeSelectorScreen(),
-            ElevatedButton.icon(
-              onPressed: signOut,
-              icon: const Icon(Icons.logout),
-              label: const Text('Log Out'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
-            ),
           ],
         ),
       ),

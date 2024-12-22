@@ -20,6 +20,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _obscurePassword = true;
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
@@ -37,7 +38,6 @@ class _LoginPageState extends State<LoginPage> {
             await _showEmailVerificationDialog(userCredential.user!);
           }
         } else {
-
           if (mounted) {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => WritingAssistantApp()),
@@ -64,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
         }
 
         if (mounted) {
-          showError(context, errorMessage );
+          showError(context, errorMessage);
         }
       } finally {
         if (mounted) setState(() => _isLoading = false);
@@ -196,7 +196,8 @@ class _LoginPageState extends State<LoginPage> {
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide.none,
                             ),
-                            prefixIcon: Icon(Icons.email, color: Colors.white70),
+                            prefixIcon:
+                                Icon(Icons.email, color: Colors.white70),
                             contentPadding: EdgeInsets.symmetric(vertical: 16),
                           ),
                           validator: (value) {
@@ -218,7 +219,8 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         child: TextFormField(
                           controller: _passwordController,
-                          obscureText: true,
+                          obscureText:
+                              _obscurePassword, // Add this variable to your state
                           style: TextStyle(color: Colors.white),
                           decoration: InputDecoration(
                             hintText: 'Password',
@@ -228,6 +230,19 @@ class _LoginPageState extends State<LoginPage> {
                               borderSide: BorderSide.none,
                             ),
                             prefixIcon: Icon(Icons.lock, color: Colors.white70),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: Colors.white70,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
+                            ),
                             contentPadding: EdgeInsets.symmetric(vertical: 16),
                           ),
                           validator: (value) {
@@ -240,7 +255,9 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       SizedBox(height: 24),
                       _isLoading
-                          ? Center(child: CircularProgressIndicator(color: Colors.white))
+                          ? Center(
+                              child: CircularProgressIndicator(
+                                  color: Colors.white))
                           : ElevatedButton(
                               onPressed: _login,
                               style: ElevatedButton.styleFrom(
@@ -293,7 +310,8 @@ class _LoginPageState extends State<LoginPage> {
                             onPressed: () {
                               if (mounted) {
                                 Navigator.of(context).push(
-                                  MaterialPageRoute(builder: (_) => SignUpPage()),
+                                  MaterialPageRoute(
+                                      builder: (_) => SignUpPage()),
                                 );
                               }
                             },

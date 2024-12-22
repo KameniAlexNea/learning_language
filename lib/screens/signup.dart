@@ -24,6 +24,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   bool _isLoading = false;
+  bool _obscurePassword = true;
 
   Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
@@ -289,7 +290,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                         child: TextFormField(
                           controller: _passwordController,
-                          obscureText: true,
+                          obscureText: _obscurePassword,
                           style: TextStyle(color: Colors.white),
                           decoration: InputDecoration(
                             hintText: 'Password',
@@ -299,6 +300,19 @@ class _SignUpPageState extends State<SignUpPage> {
                               borderSide: BorderSide.none,
                             ),
                             prefixIcon: Icon(Icons.lock, color: Colors.white70),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: Colors.white70,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
+                            ),
                             contentPadding: EdgeInsets.symmetric(vertical: 16),
                           ),
                           validator: (value) {
