@@ -213,14 +213,14 @@ class _TypingScreenState extends State<TypingScreen> {
                 Column(
                   children: [
                     IconButton(
-                      icon: const Icon(LucideIcons.save),
+                      icon: const Icon(LucideIcons.share2),
                       onPressed: DiscusiaConfig.isSavingState ||
                               DiscusiaConfig.currentTopic.isEmpty ||
                               DiscusiaConfig.evaluation.isEmpty
                           ? null
                           : _saveData,
                     ),
-                    const Text("Save"),
+                    const Text("Share"),
                   ],
                 ),
               ],

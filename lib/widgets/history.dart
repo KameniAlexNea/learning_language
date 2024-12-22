@@ -15,6 +15,8 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  int _currentPage = 0;
+  static const int _itemsPerPage = 7;
 
   @override
   void dispose() {
@@ -27,6 +29,13 @@ class _HistoryPageState extends State<HistoryPage> {
     return interactions.where((interaction) =>
       interaction.theme.toLowerCase().contains(_searchQuery.toLowerCase())
     ).toList();
+  }
+
+  List<DiscussionUserInteraction> _paginateInteractions(List<DiscussionUserInteraction> interactions) {
+    final startIndex = _currentPage * _itemsPerPage;
+    final endIndex = startIndex + _itemsPerPage;
+    if (startIndex >= interactions.length) return [];
+    return interactions.sublist(startIndex, endIndex.clamp(0, interactions.length));
   }
 
   @override
@@ -55,6 +64,7 @@ class _HistoryPageState extends State<HistoryPage> {
                         setState(() {
                           _searchController.clear();
                           _searchQuery = '';
+                          _currentPage = 0; // Reset to first page when clearing search
                         });
                       },
                     )
@@ -63,6 +73,7 @@ class _HistoryPageState extends State<HistoryPage> {
               onChanged: (value) {
                 setState(() {
                   _searchQuery = value;
+                  _currentPage = 0; // Reset to first page when search query changes
                 });
               },
             ),
@@ -95,6 +106,8 @@ class _HistoryPageState extends State<HistoryPage> {
                 }
 
                 final filteredInteractions = _filterInteractions(snapshot.data!);
+                final paginatedInteractions = _paginateInteractions(filteredInteractions);
+                final totalPages = (filteredInteractions.length / _itemsPerPage).ceil();
 
                 if (filteredInteractions.isEmpty) {
                   return Center(
@@ -108,34 +121,66 @@ class _HistoryPageState extends State<HistoryPage> {
                   );
                 }
 
-                return ListView.separated(
-                  itemCount: filteredInteractions.length,
-                  separatorBuilder: (context, index) => const Divider(height: 1),
-                  itemBuilder: (context, index) {
-                    final interaction = filteredInteractions[index];
-                    return ListTile(
-                      title: buildCard(
-                        context, "Topic $index", interaction.theme),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Date: ${interaction.createdAt.toLocal().toString().split(' ')[0]}",
-                            style: TextStyle(color: Colors.grey.shade600),
-                          ),
-                        ],
+                return Column(
+                  children: [
+                    Expanded(
+                      child: ListView.separated(
+                        itemCount: paginatedInteractions.length,
+                        separatorBuilder: (context, index) => const Divider(height: 1),
+                        itemBuilder: (context, index) {
+                          final interaction = paginatedInteractions[index];
+                          final globalIndex = _currentPage * _itemsPerPage + index;
+                          return ListTile(
+                            title: buildCard(
+                              context, "Topic $globalIndex", interaction.theme),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Date: ${interaction.createdAt.toLocal().toString().split(' ')[0]}",
+                                  style: TextStyle(color: Colors.grey.shade600),
+                                ),
+                              ],
+                            ),
+                            trailing: const Icon(Icons.chevron_right),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DetailPage(interaction: interaction),
+                                ),
+                              );
+                            },
+                          );
+                        },
                       ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DetailPage(interaction: interaction),
-                          ),
-                        );
-                      },
-                    );
-                  },
+                    ),
+                    if (totalPages > 1)
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.chevron_left),
+                              onPressed: _currentPage > 0
+                                ? () => setState(() => _currentPage--)
+                                : null,
+                            ),
+                            Text(
+                              '${_currentPage + 1} / $totalPages',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.chevron_right),
+                              onPressed: _currentPage < totalPages - 1
+                                ? () => setState(() => _currentPage++)
+                                : null,
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
                 );
               },
             ),
