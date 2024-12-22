@@ -75,7 +75,7 @@ class DetailPage extends StatelessWidget {
               // User Answer Section
               buildCard(
                   context,
-                  "${interaction.userId == uid ? "Your" : "User"} Response",
+                  "${interaction.userId == uid ? "Your" : "Discusian"} Response",
                   interaction.userAnswer),
 
               SizedBox(height: 16),
