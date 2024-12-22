@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -126,9 +125,6 @@ class _SignUpPageState extends State<SignUpPage> {
       case 'email-already-in-use':
         return 'An account already exists with this email.';
       default:
-        if (kDebugMode) {
-          print(code);
-        }
         return 'Sign up failed';
     }
   }

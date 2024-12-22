@@ -18,19 +18,10 @@ class DiscusiaConfig {
   static const String _evaluationKey = 'evaluation';
   static const String _suggestedAnswerKey = 'suggested_answer';
   static const String _suggestedIdeaKey = 'suggested_idea';
-  static const String _errorMessageKey = 'error_message';
 
   // checker to avoid multiple ideas generated
   static get currentTopicHasIdea => suggestedIdea.isNotEmpty;
   static get currentTopicHasAnswer => suggestedAnswer.isNotEmpty;
-
-  // Getters and setters with persistence
-  static String _errorMessage = "";
-  static String get errorMessage => _errorMessage;
-  static set errorMessage(String value) {
-    _errorMessage = value;
-    _prefs.setString(_errorMessageKey, value);
-  }
 
   static String _currentTopic = "";
   static String get currentTopic => _currentTopic;
@@ -62,7 +53,6 @@ class DiscusiaConfig {
 
   // Load saved state from SharedPreferences
   static Future<void> _loadSavedState() async {
-    _errorMessage = _prefs.getString(_errorMessageKey) ?? "";
     _currentTopic = _prefs.getString(_topicKey) ?? "";
     _evaluation = _prefs.getString(_evaluationKey) ?? "";
     _suggestedAnswer = _prefs.getString(_suggestedAnswerKey) ?? "";
@@ -87,7 +77,6 @@ class DiscusiaConfig {
   static List<DiscussionUserInteraction> interactions = [];
 
   static void clearInterface({bool withTopic = false}) {
-    errorMessage = "";
     evaluation = "";
     suggestedAnswer = "";
     suggestedIdea = "";

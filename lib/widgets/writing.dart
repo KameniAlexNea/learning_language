@@ -54,13 +54,9 @@ class _TypingScreenState extends State<TypingScreen> {
         });
         DiscusiaConfig.clearInterface();
       } on SocketException catch (e) {
-        setState(() {
-          DiscusiaConfig.errorMessage = "Network error: ${e.message}";
-        });
+        if (mounted) showError(context, "Network error: ${e.message}");
       } catch (e) {
-        setState(() {
-          DiscusiaConfig.errorMessage = "An unexpected error occurred: $e";
-        });
+        if (mounted) showError(context, "An unexpected error occurred: $e");
       }
     } finally {
       setState(() => DiscusiaConfig.isGeneratingTopic = false);
@@ -71,11 +67,10 @@ class _TypingScreenState extends State<TypingScreen> {
     if (!checkCurrentTopicNotEmpty() ||
         DiscusiaConfig.responseController.text.isEmpty) {
       showError(
-        context,
-        "Please complete the following steps before evaluation:\n"
-        "1. Generate a topic\n"
-        "2. Fill in some text\n"
-      );
+          context,
+          "Please complete the following steps before evaluation:\n"
+          "1. Generate a topic\n"
+          "2. Fill in some text\n");
       return;
     }
     setState(() => DiscusiaConfig.isEvaluatingResponse = true);
@@ -88,7 +83,6 @@ class _TypingScreenState extends State<TypingScreen> {
 
       setState(() {
         DiscusiaConfig.evaluation = response ?? "No evaluation generated.";
-        DiscusiaConfig.errorMessage = "";
         if (response != null) {
           widget.tabController.animateTo(3);
         }
@@ -100,10 +94,8 @@ class _TypingScreenState extends State<TypingScreen> {
 
   Future<void> getSuggestedAnswer() async {
     if (!checkCurrentTopicNotEmpty()) {
-      showError(
-        context,
-        "To suggest an answer, you have to generate first a discussion topic"
-      );
+      showError(context,
+          "To suggest an answer, you have to generate first a discussion topic");
       return;
     }
     setState(() => DiscusiaConfig.isGettingSuggestedAnswer = true);
@@ -115,7 +107,6 @@ class _TypingScreenState extends State<TypingScreen> {
 
       setState(() {
         DiscusiaConfig.suggestedAnswer = response ?? "No suggestion generated.";
-        DiscusiaConfig.errorMessage = "";
         // Switch to the Suggested Answer tab
         if (response != null) {
           widget.tabController.animateTo(2);
@@ -128,10 +119,8 @@ class _TypingScreenState extends State<TypingScreen> {
 
   Future<void> getSuggestedIdea() async {
     if (!checkCurrentTopicNotEmpty()) {
-      showError(
-        context,
-        "To suggest ideas, you have to generate first a discussion topic"
-      );
+      showError(context,
+          "To suggest ideas, you have to generate first a discussion topic");
       return;
     }
     setState(() => DiscusiaConfig.isGettingSuggestedIdea = true);
@@ -143,7 +132,6 @@ class _TypingScreenState extends State<TypingScreen> {
 
       setState(() {
         DiscusiaConfig.suggestedIdea = response ?? "No suggestion idea.";
-        DiscusiaConfig.errorMessage = "";
         // Switch to the Suggested Answer tab
         if (response != null) widget.tabController.animateTo(2);
       });
@@ -191,7 +179,8 @@ class _TypingScreenState extends State<TypingScreen> {
                     IconButton(
                       icon: const Icon(LucideIcons.lightbulb),
                       onPressed: DiscusiaConfig.isGettingSuggestedIdea ||
-                              DiscusiaConfig.currentTopic.isEmpty || DiscusiaConfig.currentTopicHasIdea
+                              DiscusiaConfig.currentTopic.isEmpty ||
+                              DiscusiaConfig.currentTopicHasIdea
                           ? null
                           : getSuggestedIdea,
                     ),
@@ -203,7 +192,8 @@ class _TypingScreenState extends State<TypingScreen> {
                     IconButton(
                       icon: const Icon(LucideIcons.messageCircle),
                       onPressed: DiscusiaConfig.isGettingSuggestedAnswer ||
-                              DiscusiaConfig.currentTopic.isEmpty || DiscusiaConfig.currentTopicHasAnswer
+                              DiscusiaConfig.currentTopic.isEmpty ||
+                              DiscusiaConfig.currentTopicHasAnswer
                           ? null
                           : getSuggestedAnswer,
                     ),
@@ -225,11 +215,6 @@ class _TypingScreenState extends State<TypingScreen> {
                 ),
               ],
             ),
-            if (DiscusiaConfig.errorMessage.isNotEmpty)
-              Text(
-                "Error: ${DiscusiaConfig.errorMessage}",
-                style: const TextStyle(color: Colors.red),
-              ),
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),

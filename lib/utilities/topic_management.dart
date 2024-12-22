@@ -25,9 +25,6 @@ void showSuccess(BuildContext context, String message) {
 
 bool checkCurrentTopicNotEmpty() {
   if (DiscusiaConfig.currentTopic.isEmpty) {
-    DiscusiaConfig.errorMessage =
-        "Current topic cannot be empty. Please, first generate a topic";
-
     return false;
   }
   return true;
