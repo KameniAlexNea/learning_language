@@ -1,16 +1,18 @@
 class DiscussionInteraction {
+  String? uid;
   final String theme;
   final String userAnswer;
   final String evaluation;
   final String suggestedIdea;
   final String suggestedAnswer;
 
-  const DiscussionInteraction({
+  DiscussionInteraction({
     required this.theme,
     required this.userAnswer,
     required this.evaluation,
     required this.suggestedIdea,
     required this.suggestedAnswer,
+    this.uid,
   });
 
   Map<String, dynamic> toJson() => {
@@ -25,6 +27,7 @@ class DiscussionInteraction {
     try {
       return DiscussionInteraction(
         theme: json['theme'] ?? '',
+        uid: json['uid'] ?? '',
         userAnswer: json['userAnswer'] ?? '',
         evaluation: json['evaluation'] ?? '',
         suggestedIdea: json['suggestedIdea'] ?? '',
@@ -50,6 +53,7 @@ class DiscussionUserInteraction extends DiscussionInteraction {
     required super.suggestedAnswer,
     DateTime? createdAt,
     DateTime? updatedAt,
+    super.uid,
   })  : createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
 
@@ -61,7 +65,7 @@ class DiscussionUserInteraction extends DiscussionInteraction {
         'updatedAt': updatedAt.toIso8601String(),
       };
 
-  static DiscussionUserInteraction fromJson(Map<String, dynamic> json) {
+  static DiscussionUserInteraction fromJson(String docid, Map<String, dynamic> json) {
     try {
       return DiscussionUserInteraction(
         theme: json['theme'] ?? '',
@@ -70,12 +74,9 @@ class DiscussionUserInteraction extends DiscussionInteraction {
         suggestedIdea: json['suggestedIdea'] ?? '',
         suggestedAnswer: json['suggestedAnswer'] ?? '',
         userId: json['userId'] ?? '',
-        createdAt: json['createdAt'] != null
-            ? DateTime.parse(json['createdAt'])
-            : null,
-        updatedAt: json['updatedAt'] != null
-            ? DateTime.parse(json['updatedAt'])
-            : null,
+        createdAt: json['createdAt']?.toDate(),
+        updatedAt: json['updatedAt']?.toDate(),
+        uid: docid,
       );
     } catch (e) {
       throw FormatException('Error parsing DiscussionUserInteraction: $e');

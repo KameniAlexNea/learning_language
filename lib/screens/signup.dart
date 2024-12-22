@@ -1,12 +1,12 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:password_field_validator/password_field_validator.dart';
 import 'package:email_validator/email_validator.dart';
-import '../db/database.dart';
+import '../db/discussion.dart';
+import '../utilities/topic_management.dart';
 import 'login.dart';
-import '../utilities/auth_google.dart';
+import '../db/auth_google.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -23,28 +23,25 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   bool _isLoading = false;
+  bool _obscurePassword = true;
 
   Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
       if (_passwordController.text != _confirmPasswordController.text) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Passwords do not match')),
-          );
+          showError(context, 'Passwords do not match');
         }
         return;
       }
 
       setState(() => _isLoading = true);
 
-      bool isUsernameAvailable =
-          await checkUsernameAvailability(_usernameController.text.trim());
+      bool isUsernameAvailable = await UserDBManager.checkUsernameAvailability(
+          _usernameController.text.trim());
       if (!isUsernameAvailable) {
         setState(() => _isLoading = false);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Username is already taken')),
-          );
+          showError(context, 'Username is already taken');
         }
         return;
       }
@@ -65,7 +62,7 @@ class _SignUpPageState extends State<SignUpPage> {
           await _showEmailVerificationDialog(userCredential.user!);
         }
 
-        await createUser(userCredential.user!.uid,
+        await UserDBManager.createUser(userCredential.user!.uid,
             _usernameController.text.trim(), _emailController.text.trim());
 
         // Navigate to the main application after successful sign-up
@@ -76,9 +73,7 @@ class _SignUpPageState extends State<SignUpPage> {
         }
       } on FirebaseAuthException catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(_getErrorMessage(e.code))),
-          );
+          showError(context, _getErrorMessage(e.code));
         }
       } finally {
         if (mounted) {
@@ -100,10 +95,11 @@ class _SignUpPageState extends State<SignUpPage> {
 
       final user = userCredential!.user;
       if (user != null) {
-        final userDoc = await getUser(user.uid);
+        final userDoc = await UserDBManager.getUser(user.uid);
 
         if (!userDoc.exists) {
-          await createUser(user.uid, user.displayName ?? '', user.email ?? '');
+          await UserDBManager.createUser(
+              user.uid, user.displayName ?? '', user.email ?? '');
         }
 
         if (mounted) {
@@ -115,9 +111,7 @@ class _SignUpPageState extends State<SignUpPage> {
       }
     } on FirebaseAuthException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Google sign-up failed: ${e.message}')),
-        );
+        showError(context, 'Google sign-up failed: ${e.code}');
       }
     } finally {
       setState(() => _isLoading = false);
@@ -131,9 +125,6 @@ class _SignUpPageState extends State<SignUpPage> {
       case 'email-already-in-use':
         return 'An account already exists with this email.';
       default:
-        if (kDebugMode) {
-          print(code);
-        }
         return 'Sign up failed';
     }
   }
@@ -161,9 +152,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 await user.sendEmailVerification();
                 if (mounted) {
                   Navigator.of(this.context).pop();
-                  ScaffoldMessenger.of(this.context).showSnackBar(
-                    SnackBar(content: Text('Verification email sent')),
-                  );
+                  showSuccess(this.context, 'Verification email sent');
                 }
               },
             ),
@@ -187,158 +176,274 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(20),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Sign Up',
-                  style: GoogleFonts.roboto(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Discover, discuss, and improve your language skills with Discursia – '
-                  'where every conversation takes you closer to fluency!',
-                  style: GoogleFonts.roboto(
-                    fontSize: 16,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.black, // Add color for better customization
-                    height: 1.5, // Add line height for better readability
-                  ),
-                  textAlign: TextAlign
-                      .center, // Center-align the text for a cleaner look
-                ),
-                SizedBox(height: 30),
-                TextFormField(
-                  controller: _usernameController,
-                  decoration: InputDecoration(
-                    labelText: 'Username',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a username';
-                    }
-                    if (value.length < 3) {
-                      return 'Username must be at least 3 characters';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    // More robust email validation
-                    if (!EmailValidator.validate(value)) {
-                      return 'Please enter a valid email address';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.lock),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a password';
-                      }
-                      return null;
-                    }),
-                Padding(
-                  padding: const EdgeInsets.all(15),
-                  child: PasswordFieldValidator(
-                    minLength: 8,
-                    uppercaseCharCount: 1,
-                    lowercaseCharCount: 2,
-                    numericCharCount: 2,
-                    specialCharCount: 1,
-                    defaultColor: Colors.black,
-                    successColor: Colors.green,
-                    failureColor: Colors.red,
-                    controller: _passwordController,
-                  ),
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                  controller: _confirmPasswordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Confirm Password',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.lock_outline),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please confirm your password';
-                    }
-                    if (value != _passwordController.text) {
-                      return 'Passwords do not match';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 30),
-                if (_isLoading)
-                  CircularProgressIndicator()
-                else
-                  Column(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.white54,
+              Colors.white,
+            ],
+          ),
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: 400),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      ElevatedButton(
-                        onPressed: _signUp,
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: Size(double.infinity, 50),
+                      Text(
+                        'Create Account',
+                        style: GoogleFonts.roboto(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
                         ),
-                        child: Text('Sign Up'),
                       ),
-                      SizedBox(height: 10),
-                      OutlinedButton.icon(
-                        onPressed: _signUpWithGoogle,
-                        icon: Icon(Icons.login),
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: Size(double.infinity, 50),
+                      SizedBox(height: 8),
+                      Text(
+                        'Join Discursia and start your language learning journey',
+                        style: GoogleFonts.roboto(
+                          fontSize: 16,
+                          color: Colors.black87,
+                          height: 1.5,
                         ),
-                        label: Text('Sign Up with Google'),
+                      ),
+                      SizedBox(height: 32),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: TextFormField(
+                          controller: _usernameController,
+                          style: TextStyle(color: Colors.black),
+                          decoration: InputDecoration(
+                            hintText: 'Username',
+                            hintStyle: TextStyle(color: Colors.black54),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            prefixIcon: Icon(Icons.person, color: Colors.black87),
+                            contentPadding: EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter a username';
+                            }
+                            if (value.length < 3) {
+                              return 'Username must be at least 3 characters';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: TextFormField(
+                          controller: _emailController,
+                          style: TextStyle(color: Colors.black),
+                          decoration: InputDecoration(
+                            hintText: 'Email',
+                            hintStyle: TextStyle(color: Colors.black54),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            prefixIcon: Icon(Icons.email, color: Colors.black87),
+                            contentPadding: EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your email';
+                            }
+                            if (!EmailValidator.validate(value)) {
+                              return 'Please enter a valid email address';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: TextFormField(
+                          controller: _passwordController,
+                          obscureText: _obscurePassword,
+                          style: TextStyle(color: Colors.black),
+                          decoration: InputDecoration(
+                            hintText: 'Password',
+                            hintStyle: TextStyle(color: Colors.black54),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            prefixIcon: Icon(Icons.lock, color: Colors.black87),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: Colors.black87,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
+                            ),
+                            contentPadding: EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter a password';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Theme(
+                          data: ThemeData(
+                            textTheme: Typography.blackRedmond,
+                          ),
+                          child: PasswordFieldValidator(
+                            minLength: 8,
+                            uppercaseCharCount: 1,
+                            lowercaseCharCount: 2,
+                            numericCharCount: 2,
+                            specialCharCount: 1,
+                            defaultColor: Colors.black54,
+                            successColor: Colors.green,
+                            failureColor: Colors.red.shade300,
+                            controller: _passwordController,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: TextFormField(
+                          controller: _confirmPasswordController,
+                          obscureText: true,
+                          style: TextStyle(color: Colors.black),
+                          decoration: InputDecoration(
+                            hintText: 'Confirm Password',
+                            hintStyle: TextStyle(color: Colors.black54),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            prefixIcon: Icon(Icons.lock_outline, color: Colors.black87),
+                            contentPadding: EdgeInsets.symmetric(vertical: 16),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please confirm your password';
+                            }
+                            if (value != _passwordController.text) {
+                              return 'Passwords do not match';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 24),
+                      if (_isLoading)
+                        Center(child: CircularProgressIndicator(color: Colors.black))
+                      else
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            ElevatedButton(
+                              onPressed: _signUp,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.grey.shade50,
+                                foregroundColor: Color(0xFF1a237e),
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text('Create Account'),
+                            ),
+                            SizedBox(height: 16),
+                            Row(
+                              children: [
+                                Expanded(child: Divider(color: Colors.black38)),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 16),
+                                  child: Text(
+                                    'OR',
+                                    style: TextStyle(color: Colors.black87),
+                                  ),
+                                ),
+                                Expanded(child: Divider(color: Colors.black38)),
+                              ],
+                            ),
+                            SizedBox(height: 16),
+                            OutlinedButton.icon(
+                              onPressed: _signUpWithGoogle,
+                              icon: Icon(Icons.g_mobiledata),
+                              label: Text('Sign up with Google'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.black,
+                                side: BorderSide(color: Colors.black38),
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Already have an account? ",
+                            style: TextStyle(color: Colors.black87),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              if (mounted) {
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(builder: (_) => LoginPage()),
+                                );
+                              }
+                            },
+                            child: Text(
+                              'Log in',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    if (mounted) {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (_) => LoginPage()),
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50),
-                  ),
-                  child: Text('Already have an account? Log in'),
                 ),
-              ],
+              ),
             ),
           ),
         ),

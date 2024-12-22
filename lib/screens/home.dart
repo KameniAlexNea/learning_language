@@ -1,19 +1,40 @@
-import 'package:discursia/db/discusia.dart';
 import 'package:discursia/widgets/history.dart';
 import 'package:flutter/material.dart';
-import '../utilities/auth_google.dart';
+import '../db/auth_google.dart';
+import '../db/discussion.dart';
 import '../widgets/config.dart';
 import '../widgets/eval.dart';
 import '../widgets/suggest.dart';
 import '../widgets/writing.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import 'login.dart';
 
 class WritingAssistantApp extends StatelessWidget {
   const WritingAssistantApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: WritingAssistantScreen(),
+    return MaterialApp(
+      home: StreamBuilder<User?>(
+        stream: GoogleAuthService.authStateChanges,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+
+          if (snapshot.hasData) {
+            return const WritingAssistantScreen();
+          }
+
+          // Return login screen if user is not authenticated
+          return const LoginPage(); // You'll need to create this
+        },
+      ),
     );
   }
 }
@@ -28,20 +49,18 @@ class WritingAssistantScreen extends StatefulWidget {
 class _WritingAssistantScreenState extends State<WritingAssistantScreen>
     with SingleTickerProviderStateMixin {
   final TextEditingController apiKeyController = TextEditingController();
-
   TextEditingController responseController = TextEditingController();
+  late TabController tabController;
 
   @override
   void initState() {
     super.initState();
-
-    DiscusiaConfig.setState = setState;
-    DiscusiaConfig.tabController = TabController(length: 5, vsync: this);
+    tabController = TabController(length: 5, vsync: this);
   }
 
   @override
   void dispose() {
-    DiscusiaConfig.tabController.dispose();
+    tabController.dispose();
     apiKeyController.dispose();
     responseController.dispose();
     super.dispose();
@@ -49,12 +68,24 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
 
   @override
   Widget build(BuildContext context) {
-    final String name = GoogleAuthService.user!.displayName ?? '';
+    // Get current user using the new method
+    final User? currentUser = GoogleAuthService.currentUser;
+    final String name = currentUser?.displayName ?? '';
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Discursia, $name"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await GoogleAuthService.signOut();
+              // Navigation will be handled automatically by StreamBuilder
+            },
+          ),
+        ],
         bottom: TabBar(
-          controller: DiscusiaConfig.tabController,
+          controller: tabController,
           tabs: const [
             Tab(icon: Icon(Icons.settings), text: "App Setting"),
             Tab(icon: Icon(Icons.article), text: "Writing Task"),
@@ -65,22 +96,16 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
         ),
       ),
       body: TabBarView(
-        controller: DiscusiaConfig.tabController,
+        controller: tabController,
         children: [
-          // First Tab: API Key Configuration
           ConfigScreen(),
-
-          // Second Tab: Writing Assistant Functionality
-          TypingScreen(),
-
-          // Third Tab: Suggested Answer
+          TypingScreen(tabController: tabController),
           SuggestScreen(),
-
-          // Fourth Tab: Evaluation
           EvalScreen(),
-
-          // 5th Tab: Saved History
-          HistoryPage(interactions: DiscusiaConfig.interactions)
+          HistoryPage(
+            interactions:
+                DiscussionInteractionDBManager.getUserDiscussionInteractions(),
+          ),
         ],
       ),
     );

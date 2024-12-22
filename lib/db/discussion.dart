@@ -1,15 +1,54 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../utilities/auth_google.dart';
+import 'auth_google.dart';
 import 'model.dart';
 
+class UserDBManager {
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final String collectionName = 'users';
+
+  static Future<bool> checkUsernameAvailability(String username) async {
+    try {
+      // Check Firestore for existing username
+      final querySnapshot = await _firestore
+          .collection(collectionName)
+          .where('username', isEqualTo: username)
+          .get();
+
+      return querySnapshot.docs.isEmpty;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<void> createUser(String uid, String username, String email) {
+    return _firestore.collection(collectionName).doc(uid).set({
+      'username': username,
+      'email': email,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  static Future<DocumentSnapshot<Map<String, dynamic>>> getUser(String uid) {
+    final data = _firestore.collection(collectionName).doc(uid).get();
+    return data;
+  }
+
+  static Future<void> updateFirestoreUser(
+      String userId, String displayName) async {
+    await _firestore.collection(collectionName).doc(userId).update({
+      'displayName': displayName,
+    });
+  }
+}
+
 class DiscussionInteractionDBManager {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final String? userId = GoogleAuthService.user?.uid;
-  final String collectionName = 'discussion_interactions';
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final String? userId = GoogleAuthService.currentUser?.uid;
+  static final String collectionName = 'discussion_interactions';
 
   // Create a new discussion interaction
-  Future<String> createDiscussionInteraction(
+  static Future<String> createDiscussionInteraction(
       DiscussionInteraction interaction) async {
     try {
       if (userId == null) {
@@ -35,7 +74,7 @@ class DiscussionInteractionDBManager {
   }
 
   // Get a single discussion interaction by ID
-  Future<DiscussionUserInteraction?> getDiscussionInteraction(
+  static Future<DiscussionUserInteraction?> getDiscussionInteraction(
       String documentId) async {
     try {
       final DocumentSnapshot doc =
@@ -46,30 +85,34 @@ class DiscussionInteractionDBManager {
       }
 
       final data = doc.data() as Map<String, dynamic>;
-      return DiscussionUserInteraction.fromJson(data);
+      return DiscussionUserInteraction.fromJson(doc.id, data);
     } catch (e) {
       throw Exception('Failed to get discussion interaction: $e');
     }
   }
 
   // Get all discussion interactions for the current user
-  Stream<List<DiscussionUserInteraction>> getUserDiscussionInteractions() {
-    if (userId == null) {
-      throw Exception('User must be logged in to get interactions');
-    }
-
-    return _firestore
-        .collection(collectionName)
-        .where('userId', isEqualTo: userId)
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => DiscussionUserInteraction.fromJson(doc.data()))
-            .toList());
+  static Stream<List<DiscussionUserInteraction>> getUserDiscussionInteractions() {
+  if (userId == null) {
+    throw Exception('User must be logged in to get interactions');
   }
 
+  return _firestore
+      .collection(collectionName)
+      .where('userId', isEqualTo: userId)
+      .snapshots()
+      .map((snapshot) {
+        final interactions = snapshot.docs
+            .map((doc) => DiscussionUserInteraction.fromJson(doc.id, doc.data()))
+            .toList();
+        // Sort in memory instead of in the query
+        interactions.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        return interactions;
+      });
+}
+
   // Update an existing discussion interaction
-  Future<void> updateDiscussionInteraction(
+  static Future<void> updateDiscussionInteraction(
     String documentId,
     DiscussionInteraction updatedInteraction,
   ) async {
@@ -104,7 +147,7 @@ class DiscussionInteractionDBManager {
   }
 
   // Delete a discussion interaction
-  Future<void> deleteDiscussionInteraction(String documentId) async {
+  static Future<void> deleteDiscussionInteraction(String documentId) async {
     try {
       if (userId == null) {
         throw Exception('User must be logged in to delete an interaction');

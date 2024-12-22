@@ -1,3 +1,4 @@
+import 'package:discursia/utilities/topic_management.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter/services.dart';
@@ -28,9 +29,7 @@ class _ExpandableCardState extends State<ExpandableCard> {
     return GestureDetector(
       onLongPress: () {
         Clipboard.setData(ClipboardData(text: widget.content));
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Content copied to clipboard!')),
-        );
+        showSuccess(context, 'Content copied to clipboard!');
       },
       child: Card(
         color: widget.backgroundColor ?? Colors.white,
