@@ -1,6 +1,7 @@
 import 'package:discursia/widgets/history.dart';
 import 'package:flutter/material.dart';
 import '../db/auth_google.dart';
+import '../db/discusia.dart';
 import '../db/discussion.dart';
 import '../widgets/config.dart';
 import '../widgets/eval.dart';
@@ -55,7 +56,20 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 5, vsync: this);
+
+     // Initialize the TabController with the saved index
+    tabController = TabController(
+      length: 5, // Number of tabs
+      vsync: this,
+      initialIndex: DiscusiaConfig.tabIndex,
+    );
+
+    // Listen for tab index changes
+    tabController.addListener(() {
+      if (tabController.indexIsChanging) {
+        DiscusiaConfig.tabIndex = tabController.index;
+      }
+    });
   }
 
   @override

@@ -73,9 +73,12 @@ class _ThemeSelectorScreenState extends State<ThemeSelectorScreen>
   }
 
   bool _isValidTheme(String theme) {
+    // Match 2-20 characters, including Unicode letters, numbers, and spaces,
+    // but ensure the theme is not entirely numeric.
     return theme.length >= 2 &&
         theme.length <= 20 &&
-        RegExp(r'^[a-zA-Z0-9\s]+$').hasMatch(theme);
+        RegExp(r'^[\p{L}\p{N}\s]+$', unicode: true).hasMatch(theme) &&
+        !RegExp(r'^\d+$').hasMatch(theme);
   }
 
   void toggleSelection(String themeName) {
@@ -111,7 +114,7 @@ class _ThemeSelectorScreenState extends State<ThemeSelectorScreen>
   }
 
   void suggestClosestTheme(String input) {
-    if (input.isEmpty || (input.length < 3)) {
+    if (input.isEmpty || (input.length < 3) || themes.isEmpty) {
       setState(() {
         suggestedTheme = '';
       });

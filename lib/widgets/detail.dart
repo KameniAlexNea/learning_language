@@ -12,10 +12,10 @@ class DetailPage extends StatelessWidget {
 
   void editAnswer(DiscussionInteraction interaction, BuildContext context) {
     DiscusiaConfig.currentTopic = interaction.theme;
-    DiscusiaConfig.evaluation = interaction.evaluation;
+    // DiscusiaConfig.evaluation = interaction.evaluation;
     DiscusiaConfig.suggestedIdea = interaction.suggestedIdea;
     DiscusiaConfig.suggestedAnswer = interaction.suggestedAnswer;
-    DiscusiaConfig.responseController.text = interaction.userAnswer;
+    // DiscusiaConfig.responseController.text = interaction.userAnswer;
     // DiscusiaConfig.tabController.animateTo(1);
     Navigator.pop(context);
   }
