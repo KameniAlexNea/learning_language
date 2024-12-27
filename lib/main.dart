@@ -29,7 +29,7 @@ class DiscursiaAuthApp extends StatelessWidget {
       title: 'Discusia',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        textTheme: GoogleFonts.robotoTextTheme(),
+        textTheme: GoogleFonts.adventProTextTheme(),
       ),
       home: AuthWrapper(),
     );
