@@ -140,9 +140,33 @@ class _TypingScreenState extends State<TypingScreen> {
     }
   }
 
+  Future<void> _showEssay() async {
+    final title = DiscusiaConfig.currentTopic.isEmpty ? "Topic" : DiscusiaConfig.currentTopic.split("\n")[0]; 
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: SingleChildScrollView(
+            child: buildCard(context, "Your Essay", DiscusiaConfig.essay),
+          ),
+          scrollable: true,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, 'CLOSE'),
+              child: const Text('CLOSE'),
+            ),
+          ]
+        );
+      },
+    );
+  }
+
   // Second Tab: Writing Assistant Functionality
   @override
   Widget build(BuildContext context) {
+    DiscusiaConfig.responseController.text = DiscusiaConfig.essay;
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -222,25 +246,35 @@ class _TypingScreenState extends State<TypingScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     buildCard(
-                        context, "Current Topic", DiscusiaConfig.currentTopic),
+                        context, "Current Topic", DiscusiaConfig.currentTopic,
+                        previewLength: 100),
                     const SizedBox(height: 10),
                     TextField(
-                        controller: DiscusiaConfig.responseController,
-                        maxLines: 50, // Makes it expandable for long text
-                        keyboardType: TextInputType.multiline,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          labelText: "Write your essay here",
-                          alignLabelWithHint: true, // Aligns label to top
+                      controller: DiscusiaConfig.responseController,
+                      maxLines: 5, // Makes it expandable for long text
+                      keyboardType: TextInputType.multiline,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
                         ),
-                        style: TextStyle(fontSize: 16.0),
-                        textAlignVertical: TextAlignVertical.top,
-                        minLines: 5, // Starts with 5 lines
-                        textCapitalization: TextCapitalization.sentences),
-                    // const SizedBox(height: 10),
-                    // buildCard(context, "Evaluation", DiscusiaConfig.evaluation),
+                        labelText: "Write your essay here",
+                        alignLabelWithHint: true, // Aligns label to top
+                      ),
+                      style: TextStyle(fontSize: 16.0),
+                      textAlignVertical: TextAlignVertical.top,
+                      minLines: 5, // Starts with 5 lines
+                      textCapitalization: TextCapitalization.sentences,
+                      onChanged: (value) {
+                        print(value.length % 5);
+                        setState(() {
+                          DiscusiaConfig.essay = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    IconButton(
+                        onPressed: _showEssay,
+                        icon: const Icon(LucideIcons.view))
                   ]),
             ),
           ],

@@ -19,8 +19,7 @@ class DiscusiaConfig {
   static const String _suggestedAnswerKey = 'suggested_answer';
   static const String _suggestedIdeaKey = 'suggested_idea';
   // Add this to DiscusiaConfig
-  static const String _tabIndexKey = 'tab_index';
-
+  static const String _essayKey = 'essay_key';
 
   // checker to avoid multiple ideas generated
   static get currentTopicHasIdea => suggestedIdea.isNotEmpty;
@@ -54,14 +53,13 @@ class DiscusiaConfig {
     _prefs.setString(_suggestedIdeaKey, value);
   }
 
-
 // Load tab index during initialization
   static Future<void> _loadSavedState() async {
     _currentTopic = _prefs.getString(_topicKey) ?? "";
     _evaluation = _prefs.getString(_evaluationKey) ?? "";
     _suggestedAnswer = _prefs.getString(_suggestedAnswerKey) ?? "";
     _suggestedIdea = _prefs.getString(_suggestedIdeaKey) ?? "";
-    _tabIndex = _prefs.getInt(_tabIndexKey) ?? 0; // Default to first tab
+    _essay = _prefs.getString(_essayKey) ?? ""; // Default to first tab
   }
 
   // Rest of your existing code...
@@ -99,13 +97,12 @@ class DiscusiaConfig {
     }
   }
 
-  static int _tabIndex = 0;
-  static int get tabIndex => _tabIndex;
-  static set tabIndex(int value) {
-    _tabIndex = value;
-    _prefs.setInt(_tabIndexKey, value);
+  static String _essay = "";
+  static String get essay => _essay;
+  static set essay(String value) {
+    _essay = value;
+    if (value.length % 5 == 0) _prefs.setString(_essayKey, value);
   }
-
 
   // Add a method to clear stored data
   static Future<void> clearStoredData() async {
