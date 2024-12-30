@@ -100,8 +100,8 @@ class DiscusiaConfig {
   static String _essay = "";
   static String get essay => _essay;
   static set essay(String value) {
+    if (value != _essay) _prefs.setString(_essayKey, value);
     _essay = value;
-    if (value.length % 5 == 0) _prefs.setString(_essayKey, value);
   }
 
   // Add a method to clear stored data

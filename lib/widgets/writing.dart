@@ -141,24 +141,25 @@ class _TypingScreenState extends State<TypingScreen> {
   }
 
   Future<void> _showEssay() async {
-    final title = DiscusiaConfig.currentTopic.isEmpty ? "Topic" : DiscusiaConfig.currentTopic.split("\n")[0]; 
+    final title = DiscusiaConfig.currentTopic.isEmpty
+        ? "Topic"
+        : DiscusiaConfig.currentTopic.split("\n")[0];
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Your Essay"),
-          content: SingleChildScrollView(
-            child: buildCard(context, title, DiscusiaConfig.essay),
-          ),
-          scrollable: true,
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, 'CLOSE'),
-              child: const Text('CLOSE'),
+            title: const Text("Your Essay"),
+            content: SingleChildScrollView(
+              child: buildCard(context, title, DiscusiaConfig.essay),
             ),
-          ]
-        );
+            scrollable: true,
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'CLOSE'),
+                child: const Text('CLOSE'),
+              ),
+            ]);
       },
     );
   }
@@ -251,7 +252,7 @@ class _TypingScreenState extends State<TypingScreen> {
                     const SizedBox(height: 10),
                     TextField(
                       controller: DiscusiaConfig.responseController,
-                      maxLines: 5, // Makes it expandable for long text
+                      maxLines: 10, // Makes it expandable for long text
                       keyboardType: TextInputType.multiline,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -264,10 +265,10 @@ class _TypingScreenState extends State<TypingScreen> {
                       textAlignVertical: TextAlignVertical.top,
                       minLines: 5, // Starts with 5 lines
                       textCapitalization: TextCapitalization.sentences,
-                      onChanged: (value) {
-                        print(value.length % 5);
+                      onTapOutside: (event) {
                         setState(() {
-                          DiscusiaConfig.essay = value;
+                          DiscusiaConfig.essay =
+                              DiscusiaConfig.responseController.text;
                         });
                       },
                     ),
