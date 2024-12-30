@@ -141,3 +141,6 @@ app.*.symbols
 
 .env
 google-services.json
+# Local Netlify folder
+.netlify
+conf

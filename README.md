@@ -1,4 +1,4 @@
-# English Learning Tool
+# English Learning Tool [![Netlify Status](https://api.netlify.com/api/v1/badges/e3f068bf-5f73-42c7-baf4-566d698e86cf/deploy-status)](https://app.netlify.com/sites/discursia/deploys)
 
 This project is a web-based English learning tool that allows users to improve their writing skills by engaging in discussions on suggested topics. The tool provides feedback on user input in terms of clarity, grammar, and adherence to the topic. Additionally, it can suggest answers to topics, helping users to learn through examples.
 

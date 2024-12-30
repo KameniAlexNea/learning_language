@@ -16,6 +16,9 @@ class WritingAssistantApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        scaffoldBackgroundColor: const Color(0xFFF5F5F7), // Light grey background
+      ),
       home: StreamBuilder<User?>(
         stream: GoogleAuthService.authStateChanges,
         builder: (context, snapshot) {
@@ -31,8 +34,7 @@ class WritingAssistantApp extends StatelessWidget {
             return const WritingAssistantScreen();
           }
 
-          // Return login screen if user is not authenticated
-          return const LoginPage(); // You'll need to create this
+          return const LoginPage();
         },
       ),
     );
@@ -55,10 +57,8 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
   @override
   void initState() {
     super.initState();
-
-     // Initialize the TabController with the saved index
     tabController = TabController(
-      length: 5, // Number of tabs
+      length: 5,
       vsync: this,
       initialIndex: 1
     );
@@ -74,45 +74,57 @@ class _WritingAssistantScreenState extends State<WritingAssistantScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Get current user using the new method
     final User? currentUser = GoogleAuthService.currentUser;
     final String name = currentUser?.displayName ?? '';
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Discursia, $name"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await GoogleAuthService.signOut();
-              // Navigation will be handled automatically by StreamBuilder
-            },
+    return Center( // Wrap entire Scaffold with Center
+      child: ConstrainedBox( // Constrain entire content
+        constraints: const BoxConstraints(maxWidth: 800),
+        child: Scaffold(
+          appBar: AppBar(
+            centerTitle: false, // Center the title
+            backgroundColor: Colors.grey[200], // White background for AppBar
+            elevation: 1, // Subtle shadow
+            title: Text(
+              "Discursia, ${name.split(" ")[0]}",
+              style: const TextStyle(color: Colors.black87), // Darker text color
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.logout, color: Colors.black87),
+                tooltip: "Log Out",
+                onPressed: () async {
+                  await GoogleAuthService.signOut();
+                },
+              ),
+            ],
+            bottom: TabBar(
+              controller: tabController,
+              labelColor: Colors.black87, // Dark text for selected tab
+              unselectedLabelColor: Colors.black54, // Grey text for unselected tabs
+              tabs: const [
+                Tab(icon: Icon(Icons.settings), text: "App Setting"),
+                Tab(icon: Icon(Icons.article), text: "Writing Task"),
+                Tab(icon: Icon(Icons.lightbulb), text: "Suggested Answer"),
+                Tab(icon: Icon(Icons.score), text: "Evaluation"),
+                Tab(icon: Icon(Icons.history), text: "History"),
+              ],
+            ),
           ),
-        ],
-        bottom: TabBar(
-          controller: tabController,
-          tabs: const [
-            Tab(icon: Icon(Icons.settings), text: "App Setting"),
-            Tab(icon: Icon(Icons.article), text: "Writing Task"),
-            Tab(icon: Icon(Icons.lightbulb), text: "Suggested Answer"),
-            Tab(icon: Icon(Icons.score), text: "Evaluation"),
-            Tab(icon: Icon(Icons.history), text: "History"),
-          ],
+          body: TabBarView(
+            controller: tabController,
+            children: [
+              ConfigScreen(),
+              TypingScreen(tabController: tabController),
+              SuggestScreen(),
+              EvalScreen(),
+              HistoryPage(
+                interactions:
+                    DiscussionInteractionDBManager.getUserDiscussionInteractions(),
+              ),
+            ],
+          ),
         ),
-      ),
-      body: TabBarView(
-        controller: tabController,
-        children: [
-          ConfigScreen(),
-          TypingScreen(tabController: tabController),
-          SuggestScreen(),
-          EvalScreen(),
-          HistoryPage(
-            interactions:
-                DiscussionInteractionDBManager.getUserDiscussionInteractions(),
-          ),
-        ],
       ),
     );
   }
