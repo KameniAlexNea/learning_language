@@ -89,7 +89,7 @@ class _SignUpPageState extends State<SignUpPage> {
       UserCredential? userCredential = await GoogleAuthService.signIn();
       if (userCredential == null) {
         setState(() {
-          _isLoading = true;
+          _isLoading = false;
         });
       }
 

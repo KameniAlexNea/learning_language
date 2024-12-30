@@ -9,7 +9,7 @@ class Prompts {
     final themes = PreferencesManager.instance.loadThemes();
     final hasPreferences = themes.isNotEmpty;
     final preferenceMessage = hasPreferences
-        ? "These are the user's preferences for discussion: ${themes.join(", ")}. The user may be more engaged to discuss these subjects, but keep in mind that you're not forced to follow these topcis"
+        ? "**User Preferences**: These are the user's preferred topics for discussion: ${themes.join(", ")}. You may draw inspiration from these subjects but are not required to follow them exactly."
         : "";
 
     return [
@@ -25,9 +25,10 @@ class Prompts {
       [
         {"role": "system", "content": systemPrompt},
         {"role": "assistant", "content": currentTopic},
+        {"role": "system", "content": evaluationPrompt},
         {
           "role": "user",
-          "content": "$evaluationPrompt\n\nResponse: $userResponse"
+          "content": "User Response: $userResponse"
         },
       ];
 
@@ -48,14 +49,21 @@ class Prompts {
       : "";
 
   String get systemPrompt =>
-      """You are an AI assistant tasked with suggesting a widely appealing writing topic along with a brief, insightful commentary. The goal is to provide an engaging topic that can stimulate creative thinking and is suited to diverse writing levels. Avoid overly common themes like "A day in the life of..." or object-focused topics. Instead, aim for themes that resonate broadly and invite exploration while remaining open-ended to encourage individual expression.
+      """
+You are an AI assistant tasked with suggesting a widely appealing and inclusive writing topic along with a brief, insightful commentary. Your goal is to provide an engaging, thought-provoking topic that fosters creativity and is suitable for a diverse audience across varying writing levels. 
 
+### **Content Guidelines**
+1. **Inclusivity**: The topic must promote positive, respectful, and inclusive discussion. Avoid suggesting themes that could be offensive, divisive, or harmful to any individual or group.
+2. **Appropriateness**: Refrain from generating themes related to violence, hate, sexual abuse, or other sensitive or triggering topics that could negatively impact others.
+3. **Uniqueness**: Avoid overly common themes like "A day in the life of..." or object-focused topics. Instead, aim for open-ended themes that inspire personal exploration and diverse perspectives.
+
+### **Instructions**
 After presenting the topic, provide a concise commentary that:
-1. Explains why the topic is generally appealing and relevant.
-2. Highlights key areas or perspectives to consider within the topic.
-3. Suggests one or two writing techniques or skills that could enhance the writing experience and outcome for this topic.
+1. Explains why the topic is universally appealing and relevant while adhering to the inclusivity and appropriateness guidelines.
+2. Highlights key areas or perspectives to explore within the topic.
+3. Proposes one or two writing techniques or skills that could enhance the creative experience and outcome.
 
-Keep the commentary concise and focused, staying under 200 words to ensure clarity and ease of understanding.
+Keep your commentary under 200 words, ensuring clarity, focus, and accessibility for all users.
 $langSuffix""";
 
   String get answerSystemPrompt =>

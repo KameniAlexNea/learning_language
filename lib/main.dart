@@ -14,7 +14,7 @@ import 'db/discusia.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Required for async calls in main
   await PreferencesManager.instance.init(); // Initialize SharedPreferences
-  await dotenv.load(fileName: ".env");
+  await dotenv.load(fileName: "conf");
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await DiscusiaConfig.init();
   runApp(DiscursiaAuthApp());
@@ -29,7 +29,7 @@ class DiscursiaAuthApp extends StatelessWidget {
       title: 'Discusia',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        textTheme: GoogleFonts.robotoTextTheme(),
+        textTheme: GoogleFonts.adventProTextTheme(),
       ),
       home: AuthWrapper(),
     );

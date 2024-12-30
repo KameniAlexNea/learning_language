@@ -6,7 +6,7 @@ import 'model.dart';
 
 class DiscusiaConfig {
   static late prefs.SharedPreferences _prefs;
-  
+
   // Initialize shared preferences
   static Future<void> init() async {
     _prefs = await prefs.SharedPreferences.getInstance();
@@ -18,6 +18,8 @@ class DiscusiaConfig {
   static const String _evaluationKey = 'evaluation';
   static const String _suggestedAnswerKey = 'suggested_answer';
   static const String _suggestedIdeaKey = 'suggested_idea';
+  // Add this to DiscusiaConfig
+  static const String _essayKey = 'essay_key';
 
   // checker to avoid multiple ideas generated
   static get currentTopicHasIdea => suggestedIdea.isNotEmpty;
@@ -51,12 +53,13 @@ class DiscusiaConfig {
     _prefs.setString(_suggestedIdeaKey, value);
   }
 
-  // Load saved state from SharedPreferences
+// Load tab index during initialization
   static Future<void> _loadSavedState() async {
     _currentTopic = _prefs.getString(_topicKey) ?? "";
     _evaluation = _prefs.getString(_evaluationKey) ?? "";
     _suggestedAnswer = _prefs.getString(_suggestedAnswerKey) ?? "";
     _suggestedIdea = _prefs.getString(_suggestedIdeaKey) ?? "";
+    _essay = _prefs.getString(_essayKey) ?? ""; // Default to first tab
   }
 
   // Rest of your existing code...
@@ -72,7 +75,8 @@ class DiscusiaConfig {
   static Function get llmCall =>
       modelType == 0 ? askLLMOA : (modelType == 1 ? askLLMHF : askLLMGroq);
   static final modelType = 2;
-  static final TextEditingController responseController = TextEditingController();
+  static final TextEditingController responseController =
+      TextEditingController();
 
   static List<DiscussionUserInteraction> interactions = [];
 
@@ -91,6 +95,13 @@ class DiscusiaConfig {
       currentTopic = "";
       isGeneratingTopic = false;
     }
+  }
+
+  static String _essay = "";
+  static String get essay => _essay;
+  static set essay(String value) {
+    if (value != _essay) _prefs.setString(_essayKey, value);
+    _essay = value;
   }
 
   // Add a method to clear stored data
