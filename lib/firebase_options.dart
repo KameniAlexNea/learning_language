@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -40,8 +41,8 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDf6_MNUh1VaN1HE5u2j226wMDR7c6wkXY',
+  static FirebaseOptions get web => FirebaseOptions(
+    apiKey: dotenv.env['webApiKey'] ?? '',
     appId: '1:266530804747:web:68883ac856819c2136630e',
     messagingSenderId: '266530804747',
     projectId: 'discursia-b2e55',
@@ -50,16 +51,16 @@ class DefaultFirebaseOptions {
     measurementId: 'G-30C7R933ST',
   );
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCxYdCQSSYcSOXBLL4djkEPL5E-WPsj-eI',
+  static FirebaseOptions get android => FirebaseOptions(
+    apiKey: dotenv.env['androidApiKey'] ?? '',
     appId: '1:266530804747:android:5e0e4290995cc9b036630e',
     messagingSenderId: '266530804747',
     projectId: 'discursia-b2e55',
     storageBucket: 'discursia-b2e55.firebasestorage.app',
   );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCCnU5vbJ2Uc171ad87vkkCGXLeJAgt5yA',
+  static FirebaseOptions get ios => FirebaseOptions(
+    apiKey: dotenv.env['iosApiKey'] ?? '',
     appId: '1:266530804747:ios:504f36b4b1b33e6936630e',
     messagingSenderId: '266530804747',
     projectId: 'discursia-b2e55',
@@ -67,8 +68,8 @@ class DefaultFirebaseOptions {
     iosBundleId: 'com.alex.discursia',
   );
 
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyCCnU5vbJ2Uc171ad87vkkCGXLeJAgt5yA',
+  static FirebaseOptions get macos => FirebaseOptions(
+    apiKey: dotenv.env['macosApiKey'] ?? '',
     appId: '1:266530804747:ios:504f36b4b1b33e6936630e',
     messagingSenderId: '266530804747',
     projectId: 'discursia-b2e55',
@@ -76,8 +77,8 @@ class DefaultFirebaseOptions {
     iosBundleId: 'com.alex.discursia',
   );
 
-  static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDf6_MNUh1VaN1HE5u2j226wMDR7c6wkXY',
+  static FirebaseOptions get windows => FirebaseOptions(
+    apiKey: dotenv.env['windowsApiKey'] ?? '',
     appId: '1:266530804747:web:532b61687ebbb72336630e',
     messagingSenderId: '266530804747',
     projectId: 'discursia-b2e55',
