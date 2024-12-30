@@ -147,9 +147,9 @@ class _TypingScreenState extends State<TypingScreen> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(title),
+          title: const Text("Your Essay"),
           content: SingleChildScrollView(
-            child: buildCard(context, "Your Essay", DiscusiaConfig.essay),
+            child: buildCard(context, title, DiscusiaConfig.essay),
           ),
           scrollable: true,
           actions: [
